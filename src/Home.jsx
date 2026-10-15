@@ -1,16 +1,16 @@
 import { useEffect, useRef, useState } from 'react'
-import { INSTALL_CMD, REPO_URL, useCopy } from './shared.js'
+import { DOCS_URL, INSTALL_CMD, REPO_URL, useCopy } from './shared.js'
 import LogoIcon from './LogoIcon.jsx'
-import { QuickStart, Lifecycle, BuiltinStyles, CustomStyle, Footer } from './sections.jsx'
+import { QuickStart, Lifecycle, Targets, CustomStyle, Footer } from './sections.jsx'
 import './home.css'
 
 // x / y 是相对字标区域的百分比位置，r 是旋转角度
 const INITIAL = [
-  { id: 'guard', event: 'PreToolUse', name: 'guard', icon: '⛨', bg: '#ffe14a', x: 3, y: 6, r: -9 },
-  { id: 'journal', event: 'Stop', name: 'journal', icon: '✎', bg: '#ff9ade', x: 74, y: 2, r: 7 },
-  { id: 'tdd', event: 'PostToolUse', name: 'tdd', icon: '✓', bg: '#86f7cb', x: 80, y: 66, r: -6 },
-  { id: 'concise', event: 'UserPromptSubmit', name: 'concise', icon: '✂', bg: '#ff7a45', x: 8, y: 70, r: 5 },
-  { id: 'ver', event: 'v0.1', name: 'preview', icon: '✦', glass: true, x: 44, y: -4, r: -3 },
+  { id: 'block', event: 'tool.pre', name: 'no-force-push', icon: '⛨', bg: '#ffe14a', x: 3, y: 6, r: -9 },
+  { id: 'skill', event: 'skill', name: 'code-review', icon: '✎', bg: '#ff9ade', x: 74, y: 2, r: 7 },
+  { id: 'warn', event: 'tool.post', name: 'no-todo', icon: '✓', bg: '#86f7cb', x: 80, y: 66, r: -6 },
+  { id: 'system', event: 'system', name: 'terse', icon: '✂', bg: '#ff7a45', x: 8, y: 70, r: 5 },
+  { id: 'ver', event: 'style/v0.3', name: 'M1 preview', icon: '✦', glass: true, x: 44, y: -4, r: -3 },
 ]
 
 function Stickers() {
@@ -91,8 +91,8 @@ export default function Home() {
         <header className="sk-header">
           <a className="sk-logo" href="#top"><span className="sk-logo-mark"><LogoIcon /></span>STYLE</a>
           <nav className="sk-nav">
-            <a href="#start">文档</a>
-            <a href="#styles">示例</a>
+            <a href={DOCS_URL}>文档</a>
+            <a href="#targets">规则</a>
             <a className="sk-nav-gh" href={REPO_URL} target="_blank" rel="noreferrer">GitHub ↗</a>
           </nav>
         </header>
@@ -120,7 +120,7 @@ export default function Home() {
             <div className="sk-actions">
               <div className="sk-cmd">
                 <code><span>$</span>{INSTALL_CMD}</code>
-                <button onClick={() => copy()} aria-label="复制安装命令">{copied ? '✓' : '复制'}</button>
+                <button onClick={() => copy()} aria-label="复制命令">{copied ? '✓' : '复制'}</button>
               </div>
               <a className="sk-btn" href="#start">开始使用 →</a>
             </div>
@@ -130,7 +130,7 @@ export default function Home() {
 
       <QuickStart />
       <Lifecycle />
-      <BuiltinStyles />
+      <Targets />
       <CustomStyle />
       <Footer />
     </>
