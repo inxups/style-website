@@ -179,7 +179,7 @@ export function Footer() {
             <code><span>$</span>{INSTALL_CMD}</code>
             <button onClick={() => copy()} aria-label="复制命令">{copied ? '✓' : '复制'}</button>
           </div>
-          <a className="sk-btn" href={DOCS_URL}>阅读教程 →</a>
+          <a className="sk-btn" href={DOCS_URL}>阅读文档 →</a>
         </div>
       </div>
       <div className="foot-bar">
