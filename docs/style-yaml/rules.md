@@ -214,6 +214,7 @@ warn 规则给模型看的文本。warn 会把完整正文作为提示显示给�
 - `harness.session_id` 和 `harness.turn_id` 每次事件都会变，会让 `repeat` 去重失效，报 `T006` 警告。
 - 事件内容只能通过 `event.` 前缀引用。直接写 `{{prompt}}`、`{{tool.input}}` 会报 `event-var-in-template`。
 - 事件内容必须在规则的事件上可用，否则报 `event-var-unavailable`。例如 `event.tool.output` 和 `event.tool.output.<path>` 只在 `tool.post` 上可用。取值规则与同名条件字段相同，见 [when.md](when.md)。
+- `event.tool.input.<path>` 和 `event.tool.output.<path>` 的每一段只能由字母、数字和下划线组成，否则报 `undeclared-var`。条件字段没有这个限制：`when` 里可以写 `tool.input.old-string`，正文里不能写 `{{event.tool.input.old-string}}`，只能引用上一层的整个值（`core/template/event.go` `EventFieldKnown`）。
 - warn 规则引用事件内容时必须写 `model_text`（诊断码 `event-warn-model-text`）。
 - 事件内容被视为不可信数据。每个值最多保留 512 个字符，编码为单行 JSON 字符串，并包在 `<style-untrusted-event field="..." truncated="...">` 边界内输出，不会被当作模板或指令解析（`core/template/event.go` `FenceEvent`）。
 

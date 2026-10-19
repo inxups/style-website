@@ -244,6 +244,19 @@ when:
 
 `shell_regex` 会去掉引号，并展开命令替换、子 shell、`sh -c` / `bash -c` 脚本、`eval` 参数、送入 shell 的 heredoc、管道送入 shell 的 `echo` / `printf` / `cat` 输出、`sudo` / `xargs` 等包装器运行的命令，以及 `find -exec`。因此 `^git push` 也能匹配 `cd repo && git push`、`bash -c "git push"`。
 
+`shell_regex` 只是尽力解析，不是完整的 shell，不能当作安全边界。以下写法拆出的命令不会以 `git push` 开头，`^git push` 匹配不到：
+
+| 写法 | 拆出的命令 |
+|---|---|
+| `CMD="git push"; $CMD` | `$CMD`，不展开变量 |
+| `bash deploy.sh` | `bash deploy.sh`，不读取脚本文件 |
+| `python -c "import os; os.system('git push')"` | 整条 `python -c ...`，不解析其他解释器 |
+| `watch git push` | `watch git push`，包装器只识别 `sudo`、`doas`、`env`、`nice`、`timeout`、`stdbuf`、`xargs`、`time`、`exec`、`command`、`builtin`、`nohup` |
+| `/usr/bin/git push` | `/usr/bin/git push`，命令名保留路径 |
+| `git -C repo push` | `git -C repo push`，参数顺序不变 |
+
+嵌套超过 8 层的命令替换、`sh -c` 等不再展开（`core/when/shell.go` `maxShellDepth`）。写 block 规则时，正则应尽量宽松，例如 `(^|/)git( .*)? push`。
+
 约束：
 
 - 每项必须是 mapping，只能有 `field`、`op`、`pattern`，三者都是字符串（诊断码 `invalid-schema`）。

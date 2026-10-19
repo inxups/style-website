@@ -13,6 +13,10 @@ sources:
   - core/engine/process.go
   - core/state/dedup.go
   - core/state/state.go
+  - internal/runtime/fail.go
+  - internal/runtime/runtime.go
+  - agenthooks/install/render_claude.go
+  - internal/app/install_routes.go
 ---
 
 # action：动作与时机
@@ -115,10 +119,17 @@ rules:
 | 可选值 | `open` / `closed` |
 | 可写入 defaults | 是 |
 
-STYLE 自身的处理器在某个事件上出错（例如安装索引无效，无法可靠评估规则）时：
+STYLE 自身的处理器在某个事件上出错（例如读写会话状态失败、解析事件失败、处理器崩溃或超过内部时限），无法可靠评估规则时：
 
 - `open`：放行，不输出。
 - `closed`：拒绝该事件。保护范围是整个原生事件，`when` 条件不会缩小这个范围。
+
+`closed` 要先读到安装索引才知道哪条规则要求拒绝。索引缺失、损坏，或事件本身无法解码时，处理器读不到任何规则，规则级的 `closed` 不生效，事件照常放行（`internal/runtime/fail.go`）。需要覆盖这些情况时，用安装级的 `style install --fail-closed claude-code`：
+
+- 只支持 Claude Code 2.1.295 及以上版本，只作用于 PreToolUse hook。
+- 处理器出错时拒绝工具调用，索引不可用时也拒绝，并以退出码 1 结束。
+- 写入 hook 配置的 `onFailure: block`，由 Claude Code 在 hook 进程本身失败时阻止调用。
+- 设置会保存在 `style.lock.yaml` 中，之后的 install、sync 沿用（`internal/app/install_routes.go`）。
 
 约束：
 
@@ -172,6 +183,7 @@ STYLE 自身的处理器在某个事件上出错（例如安装索引无效，�
 4. **warn 的输出**：评估点只支持一种输出能力时，只发出对应的那部分：只有 add-context 时用户看不到提示，只有 system-message 时模型收不到文本（`core/engine/process.go`）。
 5. **block 降级**：`fallback: degrade` 且评估点不支持 deny 时，block 改为 warn，`repeat` 改为 `every`（`core/plan/policy.go`）。
 6. **refresh 的计划**：system 规则使用 refresh 时必须有可输出的 `prompt.submitted` 落点；refresh 规则不会降为静态指令。`style plan` 会列出刷新策略及其限制（`core/plan/types.go` `DescribeRefresh`）。
+7. **hook 进程失败不受规则控制**：STYLE 在 harness 给 hook 的时限内处理事件，内部时限是 hook 超时的 90%，未声明超时时为 55 秒；超过内部时限按 `fail` 处理。如果 `style` 可执行文件无法启动、进程在读取事件前退出，或者被 harness 按超时终止，就由 harness 决定是否继续，`action: block` 和 `fail: closed` 都管不到。Codex 上 STYLE 的 hook 超时固定为 10 秒（`internal/adapter/codex/adapter.go`）；Claude Code 上不设超时，使用 harness 的默认值。Claude Code 用户可以用上面的 `--fail-closed` 让这类失败也阻止工具调用。
 
 ## 示例
 

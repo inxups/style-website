@@ -10,6 +10,8 @@ sources:
   - core/spec/validate.go
   - core/spec/validate_files.go
   - core/spec/merge.go
+  - internal/source/source.go
+  - internal/source/git.go
 ---
 
 # 概览：包的形态与加载流程
@@ -69,6 +71,14 @@ tone.style.md              # 单文件包：front matter + 正文
 - 单个文件不超过 256 KiB（`file-too-large`）。
 - 必须是 UTF-8 文本，不含 NUL 字节（`bad-encoding`）。
 - front matter 必须以 `---` 开始并以 `---` 结束（`invalid-frontmatter`）。
+
+从 Git 仓库安装时，STYLE 会导出选中的整个包目录，不只是 STYLE.yaml 引用到的文件，导出内容还要满足以下限制，否则报 `source-limit` 或 `source-invalid`（`internal/source/source.go`、`internal/source/git.go`）：
+
+- 最多 1024 个文件，合计不超过 16 MiB，单个文件不超过 256 KiB。
+- 每个文件都必须是 UTF-8 文本，不含 NUL 字节。目录里放图片等二进制文件会导致整个包无法安装。
+- 不能包含符号链接或子模块。
+- 路径不能只有大小写不同，例如 `Rules/` 和 `rules/` 不能同时存在。
+- `.git`、`.hg`、`.svn`、`.DS_Store` 会被跳过，不计入上述限制。
 
 ### 加载之后
 

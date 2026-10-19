@@ -9,6 +9,7 @@ sources:
   - core/spec/merge.go
   - core/compile/values.go
   - core/engine/process.go
+  - core/compile/dedup.go
 ---
 
 # package：包级元数据
@@ -142,6 +143,7 @@ STYLE 规范版本。当前只接受 `style/v0.3`。
 2. **至少一条声明**：目录包的 `rules` 和 `native_hooks` 不能同时为空（诊断码 `invalid-schema`）。
 3. **priority 的默认值链**：规则的 `priority` 依次取规则字段、`defaults.priority`、包级 `priority`、`50`。原生 hook 的 `priority` 依次取 hook 字段、包级 `priority`、`50`，不读 `defaults`（`core/spec/merge.go` `Merge`）。
 4. **排序**：编译和运行时都按 `[priority, 包安装顺序, 规则序号]` 升序排列条目（`core/compile/values.go`、`core/engine/process.go` `lessOrder`）。
+5. **跨包去重**：安装多个包时，如果不同包的规则在同一个 harness 上编译结果完全相同（落点、正文、条件、输出能力都一致，只有 id、来源和优先级不同），只保留排序最靠前的一条，其余不再安装也不计入预算。安装输出的 Token 段会显示 `deduplicated into <包>/<规则>`。同一个包里有两条等价规则时不去重，只报警告（`core/compile/dedup.go` `deduplicate`）。
 
 ## 示例
 
