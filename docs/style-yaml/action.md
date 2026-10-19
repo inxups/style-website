@@ -124,7 +124,7 @@ STYLE 自身的处理器在某个事件上出错（例如读写会话状态失�
 - `open`：放行，不输出。
 - `closed`：拒绝该事件。保护范围是整个原生事件，`when` 条件不会缩小这个范围。
 
-`closed` 要先读到安装索引才知道哪条规则要求拒绝。索引缺失、损坏，或事件本身无法解码时，处理器读不到任何规则，规则级的 `closed` 不生效，事件照常放行（`internal/runtime/fail.go`）。需要覆盖这些情况时，用安装级的 `style install --fail-closed claude-code`：
+`closed` 要先读到安装索引才知道哪条规则要求拒绝。索引缺失、损坏，或事件本身无法解码时，处理器读不到任何规则，规则级的 `closed` 不生效，事件照常放行（`internal/runtime/fail.go`）。需要覆盖这些情况时，用安装级的 `style install --fail-closed`：
 
 - 只支持 Claude Code 2.1.295 及以上版本，只作用于 PreToolUse hook。
 - 处理器出错时拒绝工具调用，索引不可用时也拒绝，并以退出码 1 结束。

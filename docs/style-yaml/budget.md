@@ -95,7 +95,7 @@ rules:
 5. **命令行为**（`internal/app/command.go`）：
    - `style validate` 检查 `T001`，并对每个已注册的 harness 估算 `T002`、`T004`。出现 error 时退出码为 1。
    - `style plan` 先做校验：`T001` 为 error 时校验失败，退出码为 1，不输出计划。校验通过后在 `Token` 段报告估算值和诊断；`T002`、`T004` 为 error 时退出码为 4，计划被拒绝。
-6. **安装后的总量**：安装、更新、同步、卸载等需要重新编译已安装包的操作，会把同一 harness 上所有已安装包的输出按事件合计。超过 adapter 输入上限的 80% 时报 `T003`（error），操作被阻止。adapter 上限可用 `style adapters` 查看，例如 Codex 约 2500 tokens，Claude Code 10000 字符（`core/tokens/installed.go`）。
+6. **安装后的总量**：安装、更新、同步、卸载等需要重新编译已安装包的操作，会把同一 harness 上所有已安装包的输出按事件合计。超过 adapter 输入上限的 80% 时报 `T003`（error），操作被阻止。adapter 上限可用 `style doctor` 查看，例如 Codex 约 2500 tokens，Claude Code 10000 字符（`core/tokens/installed.go`）。
 7. **运行时截断**：`T003` 只在安装时用估算值检查。事件实际发生时，如果同一事件上所有命中规则的模型文本合计仍然超过 adapter 输入上限（不是 80%），STYLE 会按 `[priority, 包安装顺序, 规则序号]` 从后往前丢弃整条规则，直到合计不超过上限。被丢弃的规则不输出，也不报错；它的去重记录会被释放，下次命中时还会尝试输出。丢弃次数记在 `style stats` 的 `cap_drops` 列（`core/engine/process.go` `capCandidates`）。
 8. **估算是近似值**：估算是离线计算的，输出标注 `estimated; calibration pending`，与模型实际计费的 token 数可能不同。
 

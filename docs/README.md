@@ -19,6 +19,7 @@
 | [style-yaml/when.md](style-yaml/when.md) | 条件匹配 | `when`（`model` `thinking_effort` `thinking_effort_approx` `harness` `agent` `conditions` `provider`） | 已完成 |
 | [style-yaml/native-hooks.md](style-yaml/native-hooks.md) | 原生 hook 声明 | `native_hooks`（`event` `matcher` `command` `timeout`） | 已完成 |
 | [style-yaml/diagnostics.md](style-yaml/diagnostics.md) | 诊断码总表 | — | 已完成 |
+| [style-yaml/cli.md](style-yaml/cli.md) | `style` 命令行：命令、参数、确认提示、退出码 | — | 已完成 |
 
 ## 写作约定
 

@@ -189,7 +189,7 @@ skill 名称，不区分大小写。skill 规则有两个评估点：模型在�
 1. **system 规则**：静态正文（inject、无运行时变量、无 `when`、`refresh` 为 0）写入 harness 的静态指令位置，例如 Codex 的 `developer_instructions`、Claude Code 的 `claude_rules`。其他 system 规则挂在 `session.start` 和 `prompt.submitted` 上（`core/plan/system.go`）。
 2. **选择器匹配**：运行时先按选择器筛选，再评估 `when`。`tool` 按规范分类精确匹配，`names` 和 `skill` 不区分大小写（`core/engine/match.go` `matchesTarget`）。
 3. **harness 盲区**：有些 harness 只订阅固定的工具。例如 Codex 只观察 `shell`、`file.edit`、`mcp`、`*` 这几个规范分类，以及 `Bash`、`apply_patch`、`mcp__*` 原生名。选择器都不在其中时，计划结果为 `never-trigger`。
-4. **事件能力因 harness 而异**：本机 Codex 0.159.3 和 Claude Code 2.1.301 的能力如下（`style adapters` 查看）：
+4. **事件能力因 harness 而异**：本机 Codex 0.159.3 和 Claude Code 2.1.301 的能力如下（`style doctor` 查看）：
 
 | 事件 | Codex | Claude Code |
 |---|---|---|

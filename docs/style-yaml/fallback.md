@@ -21,7 +21,7 @@ sources:
 
 ## 概览
 
-`style plan` 和 `style install` 会针对每个 harness 计算每条规则的落点（placement），也就是规则在哪个事件、用哪种输出能力生效。不同 harness 支持的能力不一样，例如 Codex 在 `session.start` 只能输出 add-context，Claude Code 在 `subagent.start` 没有任何输出能力。`style adapters` 可以查看当前机器上各 harness 的能力。
+`style plan` 和 `style install` 会针对每个 harness 计算每条规则的落点（placement），也就是规则在哪个事件、用哪种输出能力生效。不同 harness 支持的能力不一样，例如 Codex 在 `session.start` 只能输出 add-context，Claude Code 在 `subagent.start` 没有任何输出能力。`style doctor` 可以查看当前机器上各 harness 的能力。
 
 当首选落点不可用时，`fallback` 决定接下来怎么做：
 
