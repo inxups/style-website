@@ -184,6 +184,7 @@ STYLE 自身的处理器在某个事件上出错（例如读写会话状态失�
 5. **block 降级**：`fallback: degrade` 且评估点不支持 deny 时，block 改为 warn，`repeat` 改为 `every`（`core/plan/policy.go`）。
 6. **refresh 的计划**：system 规则使用 refresh 时必须有可输出的 `prompt.submitted` 落点；refresh 规则不会降为静态指令。`style plan` 会列出刷新策略及其限制（`core/plan/types.go` `DescribeRefresh`）。
 7. **hook 进程失败不受规则控制**：STYLE 在 harness 给 hook 的时限内处理事件，内部时限是 hook 超时的 90%，未声明超时时为 55 秒；超过内部时限按 `fail` 处理。如果 `style` 可执行文件无法启动、进程在读取事件前退出，或者被 harness 按超时终止，就由 harness 决定是否继续，`action: block` 和 `fail: closed` 都管不到。Codex 上 STYLE 的 hook 超时固定为 10 秒（`internal/adapter/codex/adapter.go`）；Claude Code 上不设超时，使用 harness 的默认值。Claude Code 用户可以用上面的 `--fail-closed` 让这类失败也阻止工具调用。
+8. **block 优先**：同一次事件中只要有一条 block 规则命中，这次事件的 inject 和 warn 规则都不输出，所有已安装包都一样。多条 block 同时命中时，拒绝理由按规则顺序用换行拼成一条。被压下的规则不登记去重，下次命中时照常输出（`core/engine/process.go` `Process`）。所以拦截时要告诉模型的内容，要写进 block 的正文，不能指望同时命中的 inject 规则。
 
 ## 示例
 
@@ -260,6 +261,48 @@ rules:
      no child cadence without child prompt callbacks
      due output waits for its original matching point
 ```
+
+### 拦截与提示同时命中
+
+```yaml
+spec: style/v0.3
+name: ac-block
+version: 0.1.0
+description: block precedence example
+rules:
+  - id: no-rm
+    target: tool
+    tool: shell
+    action: block
+    when:
+      conditions:
+        - {field: tool.input.command, op: contains, pattern: rm -rf}
+    text: Do not run rm -rf.
+  - id: no-root
+    target: tool
+    tool: shell
+    action: block
+    when:
+      conditions:
+        - {field: tool.input.command, op: contains, pattern: " /"}
+    text: Do not touch the filesystem root.
+  - id: shell-tips
+    target: tool
+    tool: shell
+    at: before
+    text: Prefer trash over rm.
+```
+
+安装后，用 `style explain --harness claude-code --payload event.json` 重放一次 `rm -rf /` 的 PreToolUse 事件（节选）：
+
+```text
+entry "ac-block/no-rm@tool.pre" ... block=blocked repeat=repeat-bypass output=blocked
+entry "ac-block/no-root@tool.pre" ... block=blocked repeat=repeat-bypass output=blocked
+entry "ac-block/shell-tips@tool.pre" ... block=block-precedence repeat=not-evaluated output=not-evaluated
+wire stdout="{\"hookSpecificOutput\":{\"hookEventName\":\"PreToolUse\",\"permissionDecision\":\"deny\",\"permissionDecisionReason\":\"Do not run rm -rf.\\nDo not touch the filesystem root.\"}}"
+```
+
+`shell-tips` 被压下，也没有登记去重。换成 `ls` 时两条 block 都不命中，`shell-tips` 正常注入。
 
 ## 校验与诊断
 
