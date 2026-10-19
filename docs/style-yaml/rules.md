@@ -205,7 +205,7 @@ warn 规则给模型看的文本。warn 会把完整正文作为提示显示给�
 | `settings.<name>` | 安装时 | 配置项的取值，见 [requires.md](requires.md) |
 | `model`、`provider`、`thinking_effort`、`thinking_effort_raw` | 运行时 | 当前模型、服务商、思考强度（归一化值和原始值） |
 | `harness.name`、`harness.version`、`harness.cwd`、`harness.permission_mode`、`harness.agent`、`harness.session_id`、`harness.turn_id` | 运行时 | harness 信息 |
-| `event.prompt`、`event.tool.name`、`event.tool.input`、`event.tool.input.<path>`、`event.tool.added`、`event.tool.output`、`event.mcp.server`、`event.mcp.tool`、`event.skill.name` | 运行时（事件内容） | 触发事件中的内容 |
+| `event.prompt`、`event.tool.name`、`event.tool.input`、`event.tool.input.<path>`、`event.tool.added`、`event.tool.output`、`event.tool.output.<path>`、`event.mcp.server`、`event.mcp.tool`、`event.skill.name` | 运行时（事件内容） | 触发事件中的内容 |
 
 规则：
 
@@ -213,7 +213,7 @@ warn 规则给模型看的文本。warn 会把完整正文作为提示显示给�
 - 运行时变量没有默认值、`when` 也不能保证它存在时，报 `var-no-default` 警告。例如 `when.model` 不含 `unknown` 时可以保证 `{{model}}` 存在。
 - `harness.session_id` 和 `harness.turn_id` 每次事件都会变，会让 `repeat` 去重失效，报 `T006` 警告。
 - 事件内容只能通过 `event.` 前缀引用。直接写 `{{prompt}}`、`{{tool.input}}` 会报 `event-var-in-template`。
-- 事件内容必须在规则的事件上可用，否则报 `event-var-unavailable`。例如 `event.tool.output` 只在 `tool.post` 上可用。
+- 事件内容必须在规则的事件上可用，否则报 `event-var-unavailable`。例如 `event.tool.output` 和 `event.tool.output.<path>` 只在 `tool.post` 上可用。取值规则与同名条件字段相同，见 [when.md](when.md)。
 - warn 规则引用事件内容时必须写 `model_text`（诊断码 `event-warn-model-text`）。
 - 事件内容被视为不可信数据。每个值最多保留 512 个字符，编码为单行 JSON 字符串，并包在 `<style-untrusted-event field="..." truncated="...">` 边界内输出，不会被当作模板或指令解析（`core/template/event.go` `FenceEvent`）。
 

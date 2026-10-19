@@ -10,6 +10,7 @@ sources:
   - core/tokens/budget.go
   - core/tokens/installed.go
   - internal/app/command.go
+  - internal/app/plan.go
 ---
 
 # budget：token 预算
@@ -88,7 +89,7 @@ rules:
    - block 规则：拒绝理由，即正文。`target: event` 且事件不是 `tool.pre` 的 block 规则估算为 0。
    - `event.*` 模板变量按最坏情况估算（512 个字符，每个字符取最大转义宽度），单个变量约 1800 tokens。使用事件内容的规则通常需要放宽 `max_tokens` 和 `per_event`。
 2. **规则上限**：`max_tokens` 依次取规则字段、`defaults.max_tokens`、`budget.per_rule`、`400`。超出时报 `T001`（`core/spec/validate_lints.go`、`core/tokens/analyze.go`）。
-3. **事件和常驻合计**：按 harness 分别计算。`per_event` 按原生事件（和工具）分桶累加，超出时报 `T002`；常驻内容累加，超出时报 `T004`（`core/tokens/analyze.go`）。
+3. **事件和常驻合计**：按 harness 分别计算。`per_event` 按原生事件（和工具）分桶累加，超出时报 `T002`。Claude Code 的 `tool.post` 规则同时计入 `PostToolUse <工具>` 和 `PostToolUseFailure <工具>` 两个桶；同一工具的 `tool.error` 规则也计入后者（`internal/app/plan.go`）；常驻内容累加，超出时报 `T004`（`core/tokens/analyze.go`）。
 4. **级别**：`on: warn` 时上述诊断都是 warning；`on: error` 时都是 error。
 5. **命令行为**（`internal/app/command.go`）：
    - `style validate` 检查 `T001`，并对每个已注册的 harness 估算 `T002`、`T004`。出现 error 时退出码为 1。

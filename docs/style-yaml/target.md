@@ -11,6 +11,8 @@ sources:
   - core/compile/entries.go
   - core/engine/match.go
   - agenthooks/event.go
+  - internal/app/install.go
+  - internal/adapter/claude/runtime.go
 ---
 
 # target：规则作用对象
@@ -139,8 +141,8 @@ skill 名称，不区分大小写。skill 规则有两个评估点：模型在�
 | `session.start` | 会话开始，由 `sources` 筛选来源 |
 | `prompt.submitted` | 用户提交提示 |
 | `tool.pre` | 任意工具调用前 |
-| `tool.post` | 任意工具调用成功后 |
-| `tool.error` | 任意工具调用失败后 |
+| `tool.post` | 任意工具调用结束后，失败的调用也会触发（见下文"失败与中断"） |
+| `tool.error` | 任意工具调用失败后（只有 Claude Code 支持） |
 | `subagent.start` | 子代理启动 |
 
 约束：
@@ -200,6 +202,17 @@ skill 名称，不区分大小写。skill 规则有两个评估点：模型在�
 | `subagent.start` | add-context | 无 |
 
 缺少能力时怎么处理，见 [fallback.md](fallback.md)。
+
+5. **失败与中断**：两个 harness 报告失败的方式不同。
+
+| 情况 | Codex | Claude Code |
+|---|---|---|
+| 工具调用失败 | 和成功一样走 PostToolUse，只触发 `tool.post`；没有退出码 | 走 PostToolUseFailure，同时触发 `tool.error` 和 `tool.post`。安装 `tool.post` 规则时会一并订阅 PostToolUseFailure（`internal/app/install.go` `hooksForProvider`） |
+| 用户按 Esc 中断 | 未验证 | 不触发任何 hook，`tool.post` 和 `tool.error` 规则都不会运行 |
+| 失败事件带 `is_interrupt: true` | — | 只触发 `tool.error`，不触发 `tool.post`（`internal/adapter/claude/runtime.go`） |
+
+- 想区分成功和失败，在 Claude Code 上用 `tool.error` 单独匹配失败；在 Codex 上只能用 `tool.post` 规则匹配输出文本（例如 `command not found`），没法按退出码判断。
+- 已安装的包要运行一次 `style sync`，才会补上 PostToolUseFailure 订阅；在那之前 `style doctor` 会报 route drift。
 
 ## 示例
 

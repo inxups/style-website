@@ -13,6 +13,8 @@ sources:
   - core/when/predicate.go
   - core/when/shell.go
   - core/plan/plan.go
+  - internal/adapter/claude/runtime.go
+  - internal/adapter/codex/runtime.go
 ---
 
 # when：条件匹配
@@ -205,10 +207,30 @@ when:
 | `tool.input` | 整个工具输入，压缩后的 JSON 文本 | 工具事件 |
 | `tool.input.<路径>` | 工具输入中某个字段的值，例如 `tool.input.command` | 工具事件 |
 | `tool.added` | 编辑或写入新增的内容 | `tool.pre`、`tool.post`（`file.edit` / `file.write` 或 `names` 规则） |
-| `tool.output` | 工具输出 | `tool.post` |
+| `tool.output` | 工具输出；shell 是解码后的文本，其他工具可能是压缩后的 JSON 文本 | `tool.post` |
+| `tool.output.<路径>` | 工具输出中某个字段的值，例如 `tool.output.filePath` | `tool.post` |
 | `mcp.server`、`mcp.tool` | MCP 服务器和工具名 | `mcp` 规则，或工具事件上的 event 规则 |
 | `skill.name` | skill 名称 | `skill` 规则，或 `skill.explicit` |
 | `cwd` | 当前工作目录 | 所有评估点 |
+
+**字段取值**：
+
+- **`<路径>` 字段**：`tool.input.<路径>` 和 `tool.output.<路径>` 按 `.` 逐层取值，数组用下标，例如 `tool.input.edits.0.new_string`。字符串取原文，数字和布尔值取文本形式，对象和数组取压缩后的 JSON 文本，`null` 视为缺失。名称为空或含 `.` 的 key 不能用路径访问，只能匹配上一层的整个值。
+- **`tool.added`**：
+
+| 工具 | 取自 |
+|---|---|
+| Claude Code Edit | `new_string` |
+| Claude Code MultiEdit | 各项 `edits[].new_string`，用换行拼接 |
+| Claude Code Write | `content` |
+| Claude Code NotebookEdit | `new_source`；`edit_mode: delete` 时缺失 |
+| Codex apply_patch | 补丁中以 `+` 开头的行，去掉 `+` 后用换行拼接 |
+
+- **shell 的 `tool.output`**：
+  - 两个 harness 都会去掉末尾的空白和换行，开头的空白保留。
+  - Claude Code：stdout 在前；stderr 不为空时另起一行接在后面。
+  - Codex：取原生的输出文本，其中 stdout 和 stderr 的先后顺序不固定，不要写依赖两者顺序的条件。
+  - Claude Code 调用失败时，`tool.output` 取错误文本，并去掉开头的 `Exit code N` 一行；没有其他输出时为空字符串。
 
 **运算符**：
 
@@ -229,8 +251,9 @@ when:
 - `contains`、`starts_with`、`ends_with`、`not_contains` 的 `pattern` 不能为空，否则条件恒真或恒假（诊断码 `empty-pattern`）。
 - `regex` 和 `shell_regex` 的 `pattern` 必须是有效的 RE2 正则（诊断码 `bad-regex`）。
 - `field` 必须是已知字段（诊断码 `invalid-schema`），并且在规则的评估点上可用（诊断码 `condition-field-wrong-event`）。
-- 对可能缺失的字段使用 `not_contains` 会报警告。可能缺失的字段包括 `tool.added`、`tool.input.<路径>`，system 和 skill 规则上的 `prompt`，以及 event 规则上的 `mcp.*`。字段缺失时条件不成立，不会命中（诊断码 `negated-optional-field`）。
+- 对可能缺失的字段使用 `not_contains` 会报警告。可能缺失的字段包括 `tool.added`、`tool.input.<路径>`、`tool.output.<路径>`，system 和 skill 规则上的 `prompt`，以及 event 规则上的 `mcp.*`。字段缺失时条件不成立，不会命中（诊断码 `negated-optional-field`）。
 - 对整个 `tool.input` 写条件会报警告，建议改用解码后的 `tool.input.<路径>`（诊断码 `whole-tool-input`）。
+- 规则不是只选中 `tool: shell` 时，对整个 `tool.output` 写条件会报警告：非 shell 工具的输出可能是 JSON 文本，建议改用 `tool.output.<路径>`（诊断码 `whole-tool-output`）。
 
 ## 行为
 
@@ -323,6 +346,7 @@ rules:
 | `condition-field-wrong-event` | error | 条件字段在规则的评估点上不可用 |
 | `negated-optional-field` | warning | 对可能缺失的字段使用 `not_contains` |
 | `whole-tool-input` | warning | 条件字段是整个 `tool.input` |
+| `whole-tool-output` | warning | 条件字段是整个 `tool.output`，且规则不是只选中 `tool: shell` |
 
 ## 相关
 

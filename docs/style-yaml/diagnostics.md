@@ -159,6 +159,7 @@ sources:
 | `condition-field-wrong-event` | error | 条件字段在规则的评估点上不可用 |
 | `negated-optional-field` | warning | 对可能缺失的字段使用 `not_contains` |
 | `whole-tool-input` | warning | 条件字段是整个 `tool.input` |
+| `whole-tool-output` | warning | 条件字段是整个 `tool.output`，且规则不是只选中 `tool: shell` |
 
 ### 原生 hook
 
