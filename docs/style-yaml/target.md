@@ -6,7 +6,9 @@ spec: style/v0.3
 sources:
   - core/spec/validate_rules.go
   - core/spec/validate_conditions.go
+  - core/spec/merge.go
   - core/plan/requirements.go
+  - core/plan/events.go
   - core/plan/system.go
   - core/compile/entries.go
   - core/engine/match.go
@@ -278,6 +280,92 @@ Harness: claude-code
 ```
 
 Codex 不观察 `file.read` 和 `Read`，所以 `read-tips` 在 Codex 上不会触发。
+
+## 选择建议
+
+| 需求 | 推荐写法 |
+|---|---|
+| 特定工具调用前后 | `target: tool` + `tool` / `names` |
+| 特定 MCP 工具 | `target: mcp` |
+| 所有工具调用前后 | `target: tool` + `tool: "*"`；条件要用 `mcp.*`，或要对所有工具用 `tool.added` 时，改用 `target: event` |
+| 会话、提示、工具失败、子代理 | `target: event` |
+
+1. **针对特定工具，用选择器，不用 `event` + `when`。** `target: event` 的规则没有选择器，在 Claude Code 上装成空 matcher，每次工具调用都会启动 hook，再由运行时的 `when` 丢弃（`internal/app/install.go` `hooksForProvider`、`core/engine/match.go` `matchesTarget`）。`style plan` 的 token 统计里，`target: tool` + `tool: shell` 计入 `PreToolUse Bash`，`event: tool.pre` + `tool.canonical` 条件计入 `PreToolUse *`；`target: mcp` 计入 `PreToolUse mcp`，`event` + `mcp.tool` 条件同样计入 `PreToolUse *`。
+2. **需要降级时，用 `tool` / `mcp` / `skill`。** `fallback: degrade` 下，这三类规则的首选事件不可用时，会改挂另一侧（`tool.pre` ↔ `tool.post`，block 规则除外）；没有 `when` 的静态正文还能退成静态指令。`target: event` 只有一个评估点，没有这两条退路（`core/plan/requirements.go` `eventFor`、`core/plan/events.go`）。
+3. **匹配所有工具时，两种写法各有限制。** `tool: "*"` 和 `event: tool.pre` 安装结果相同，前者保留降级路径。但 `target: tool` 只在选中 `file.edit`、`file.write` 或使用 `names` 时提供 `tool.added`，也不提供 `mcp.*`；`event: tool.pre` / `tool.post` 两者都可用（`core/spec/validate_conditions.go` `conditionFieldAvailable`）。
+4. **拦截规则只写在能直接拒绝的位置。** `action: block` 用 `target: tool` / `mcp` / `skill`（规则和 `defaults` 都未写 `at` 时默认 `before`），或 `event: tool.pre` / `prompt.submitted`；`fail: closed` 同理。详见 [action.md](action.md)。
+5. **依赖 `tool.output` 的规则，显式写 `at: after`。** 未写 `at` 时会继承 `defaults.at`；包级 `defaults.at: before` 会让规则落到 `tool.pre`，那里没有工具输出，校验报 `condition-field-wrong-event`（`core/spec/merge.go`、`core/spec/validate_conditions.go`）。
+
+推荐写法：
+
+```yaml
+spec: style/v0.3
+name: tg-choose
+version: 0.1.0
+description: choose tool or event
+rules:
+  - id: shell-before
+    target: tool
+    tool: shell
+    at: before
+    text: Check the command for side effects.
+  - id: any-tool-before
+    target: event
+    event: tool.pre
+    text: Stay inside the working directory.
+  - id: guard-rm
+    target: tool
+    tool: shell
+    action: block
+    text: Do not run rm -rf.
+    when:
+      conditions:
+        - {field: tool.input.command, op: contains, pattern: rm -rf}
+  - id: shell-failed
+    target: tool
+    tool: shell
+    at: after
+    text: Read the error before retrying.
+    when:
+      conditions:
+        - {field: tool.output, op: contains, pattern: command not found}
+  - id: pr-tips
+    target: mcp
+    mcp: github/create_pull_request
+    at: before
+    text: Link the issue in the PR body.
+```
+
+`style plan tg-choose --harness claude-code` 的 token 统计（节选）：
+
+```text
+  PostToolUse Bash: 9 tokens / 31 chars
+  PostToolUseFailure Bash: 9 tokens / 31 chars
+  PreToolUse *: 10 tokens / 34 chars
+  PreToolUse Bash: 11 tokens / 35 chars
+  PreToolUse mcp: 10 tokens / 30 chars
+```
+
+只有 `any-tool-before` 挂在 `*` 上。反例：`defaults.at: before` 让依赖输出的规则失效。
+
+```yaml
+spec: style/v0.3
+name: tg-pitfall
+version: 0.1.0
+description: defaults at before breaks tool.output
+defaults:
+  at: before
+rules:
+  - id: shell-failed
+    target: tool
+    tool: shell
+    text: Read the error before retrying.
+    when:
+      conditions:
+        - {field: tool.output, op: contains, pattern: command not found}
+```
+
+`style validate` 报 `condition-field-wrong-event`；在规则上写 `at: after` 后通过。
 
 ## 校验与诊断
 
