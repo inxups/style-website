@@ -289,12 +289,14 @@ Codex 不观察 `file.read` 和 `Read`，所以 `read-tips` 在 Codex 上不会�
 | 特定 MCP 工具 | `target: mcp` |
 | 所有工具调用前后 | `target: tool` + `tool: "*"`；条件要用 `mcp.*`，或要对所有工具用 `tool.added` 时，改用 `target: event` |
 | 会话、提示、工具失败、子代理 | `target: event` |
+| 整个会话的固定约定 | `target: system`，正文写纯文本 |
 
 1. **针对特定工具，用选择器，不用 `event` + `when`。** `target: event` 的规则没有选择器，在 Claude Code 上装成空 matcher，每次工具调用都会启动 hook，再由运行时的 `when` 丢弃（`internal/app/install.go` `hooksForProvider`、`core/engine/match.go` `matchesTarget`）。`style plan` 的 token 统计里，`target: tool` + `tool: shell` 计入 `PreToolUse Bash`，`event: tool.pre` + `tool.canonical` 条件计入 `PreToolUse *`；`target: mcp` 计入 `PreToolUse mcp`，`event` + `mcp.tool` 条件同样计入 `PreToolUse *`。
 2. **需要降级时，用 `tool` / `mcp` / `skill`。** `fallback: degrade` 下，这三类规则的首选事件不可用时，会改挂另一侧（`tool.pre` ↔ `tool.post`，block 规则除外）；没有 `when` 的静态正文还能退成静态指令。`target: event` 只有一个评估点，没有这两条退路（`core/plan/requirements.go` `eventFor`、`core/plan/events.go`）。
 3. **匹配所有工具时，两种写法各有限制。** `tool: "*"` 和 `event: tool.pre` 安装结果相同，前者保留降级路径。但 `target: tool` 只在选中 `file.edit`、`file.write` 或使用 `names` 时提供 `tool.added`，也不提供 `mcp.*`；`event: tool.pre` / `tool.post` 两者都可用（`core/spec/validate_conditions.go` `conditionFieldAvailable`）。
 4. **拦截规则只写在能直接拒绝的位置。** `action: block` 用 `target: tool` / `mcp` / `skill`（规则和 `defaults` 都未写 `at` 时默认 `before`），或 `event: tool.pre` / `prompt.submitted`；`fail: closed` 同理。详见 [action.md](action.md)。
 5. **依赖 `tool.output` 的规则，显式写 `at: after`。** 未写 `at` 时会继承 `defaults.at`；包级 `defaults.at: before` 会让规则落到 `tool.pre`，那里没有工具输出，校验报 `condition-field-wrong-event`（`core/spec/merge.go`、`core/spec/validate_conditions.go`）。
+6. **system 规则不需要动态内容时，保持静态。** 纯文本的 system 规则写入 harness 的静态指令位置。正文用了运行时变量，或者加了 `when`、`refresh`，就改挂到 `session.start` 和 `prompt.submitted` 上：每次提交提示都要运行 hook 评估，输出仍按 `repeat` 去重（`core/plan/system.go`）。包级 `settings` 变量在安装时渲染，不影响静态落点，见 [rules.md](rules.md)。
 
 推荐写法：
 
@@ -366,6 +368,43 @@ rules:
 ```
 
 `style validate` 报 `condition-field-wrong-event`；在规则上写 `at: after` 后通过。
+
+system 规则的静态与动态落点：
+
+```yaml
+spec: style/v0.3
+name: tg-sys
+version: 0.1.0
+description: static vs dynamic system
+settings:
+  - name: language
+    default: English
+rules:
+  - id: static-house
+    target: system
+    text: Answer in {{settings.language}}.
+  - id: var-house
+    target: system
+    text: "Working in {{harness.cwd | default: 'the project'}}."
+  - id: when-house
+    target: system
+    when:
+      harness: {permission_mode: plan}
+    text: Use concise answers.
+```
+
+`style plan tg-sys --harness claude-code`（节选）：
+
+```text
+- static-house: native (inject system)
+  -> static:claude_rules inject (native)
+- var-house: native (inject system)
+  -> session.start inject (native); capabilities: add-context
+  -> prompt.submitted inject (native); capabilities: add-context
+- when-house: native (inject system)
+  -> session.start inject (native); capabilities: add-context
+  -> prompt.submitted inject (native); capabilities: add-context
+```
 
 ## 校验与诊断
 

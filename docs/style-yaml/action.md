@@ -304,6 +304,20 @@ wire stdout="{\"hookSpecificOutput\":{\"hookEventName\":\"PreToolUse\",\"permiss
 
 `shell-tips` 被压下，也没有登记去重。换成 `ls` 时两条 block 都不命中，`shell-tips` 正常注入。
 
+## 选择建议
+
+| 需求 | 推荐写法 |
+|---|---|
+| 给模型补充上下文 | `action: inject`，`repeat` 用默认的 `session` |
+| 同时提醒用户 | `action: warn`，模型需要更短的文字时加 `model_text` |
+| 必须阻止 | `action: block`，正文写清楚原因和替代做法 |
+| 处理器出错时也必须阻止 | block 再加 `fail: closed` |
+
+1. **warn 要落在能显示给用户的位置。** warn 同时发给用户（system-message）和模型（add-context）；评估点只有 add-context 时，用户看不到提示，计划状态是 `partial`。例如在 Codex 上，warn 挂 `session.start` 是 `partial`，挂 `tool.post` 是 `native`。写完 warn 规则后，用 `style plan` 检查有没有 `partial`（`core/engine/process.go`）。
+2. **`repeat` 默认用 `session`。** 去重的键包含渲染后的正文，正文里的变量变化时会再次输出，所以动态正文一般不需要 `every`。只有每轮或每次命中都必须提醒时，才用 `turn` 或 `every`，并写 `reason` 说明原因（诊断码 `T007`）。warn 默认就是 `every`。
+3. **block 的正文要能独立成立。** 同一次事件中 block 命中时，inject 和 warn 都不输出（行为第 8 条），所以替代做法要写进拒绝理由里，并控制在 40 tokens 以内（诊断码 `T005`）。
+4. **`fail: closed` 只用在宁可误拒的规则上。** STYLE 处理器出错（例如读写会话状态失败、超过内部时限）时，`closed` 会拒绝整个原生事件，`when` 不会缩小这个范围，也就是说即使这条规则本来不会命中，这次调用也会被拒绝（见上文 `fail`）。只给安全类拦截加，普通提醒保持默认的 `open`。
+
 ## 校验与诊断
 
 | 诊断码 | 级别 | 触发条件 |
