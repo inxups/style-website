@@ -1,7 +1,16 @@
 :root {
-  --sk-blue: #2b37ff;
-  --sk-cream: #fffbef;
-  --sk-ink: #0e0f2c;
+  /* 淡紫 + 白：violet 是按钮、链接和高亮用的主色，lilac 是首屏底色，mist 是浅紫区块底色 */
+  --sk-violet: #7c5cf5;
+  --sk-violet-deep: #5a3ed6;
+  --sk-lilac: #c9b8ff;
+  --sk-lilac-soft: #e9e2ff;
+  --sk-mist: #f7f4ff;
+  --sk-white: #fff;
+  --sk-ink: #221a3f;
+  --sk-ink-soft: #5d567a;
+  --sk-code: #241b45;
+  --sk-hero: linear-gradient(165deg, #f4efff 0%, #e0d3ff 48%, #c9b4ff 100%);
+  --sk-card-shadow: 0 1px 0 rgba(124, 92, 245, .08), 0 22px 44px -28px rgba(90, 62, 214, .45);
   --sk-font: 'Bricolage Grotesque', -apple-system, 'PingFang SC', 'Hiragino Sans GB', sans-serif;
   --sk-mono: 'JetBrains Mono', ui-monospace, Menlo, monospace;
   font-family: var(--sk-font);
@@ -9,42 +18,65 @@
 html { scroll-behavior: smooth; }
 .sk {
   position: relative; display: flex; flex-direction: column; min-height: 100vh; min-height: 100svh; overflow: hidden;
-  padding-top: 80px; background: var(--sk-blue); color: var(--sk-cream);
+  padding-top: 80px; background: var(--sk-hero); color: var(--sk-ink);
+}
+
+/* 极光：几团高饱和的紫、粉、蓝光斑缓慢漂移，上面叠一层中间清晰、四周渐隐的点阵 */
+.sk::before, .doc-hero::before {
+  content: ''; position: absolute; inset: -20%; z-index: 0; pointer-events: none;
+  background:
+    radial-gradient(36% 40% at 24% 32%, rgba(132, 98, 255, .78), transparent 70%),
+    radial-gradient(32% 36% at 80% 22%, rgba(255, 150, 220, .62), transparent 70%),
+    radial-gradient(40% 42% at 64% 80%, rgba(112, 140, 255, .58), transparent 70%),
+    radial-gradient(28% 32% at 14% 86%, rgba(190, 150, 255, .62), transparent 70%);
+  filter: blur(48px);
+  animation: sk-aurora 20s ease-in-out infinite alternate;
+}
+.sk::after, .doc-hero::after {
+  content: ''; position: absolute; inset: 0; z-index: 0; pointer-events: none;
+  background-image: radial-gradient(rgba(255, 255, 255, .6) 1px, transparent 1.5px);
+  background-size: 26px 26px;
+  -webkit-mask-image: radial-gradient(ellipse 70% 60% at 50% 42%, #000 20%, transparent 80%);
+  mask-image: radial-gradient(ellipse 70% 60% at 50% 42%, #000 20%, transparent 80%);
+}
+@keyframes sk-aurora {
+  from { transform: translate3d(0, 0, 0) rotate(0deg) scale(1); }
+  to { transform: translate3d(-5%, 4%, 0) rotate(10deg) scale(1.1); }
 }
 
 /* 背景里的透明细圆环 */
 .sk-ring { position: absolute; z-index: 0; aspect-ratio: 1; border-radius: 50%; pointer-events: none; }
-.sk-ring-1 { width: 62vw; right: -20vw; top: -26vw; border: 1.5px solid rgba(255, 255, 255, .14); }
-.sk-ring-2 { width: 40vw; left: -16vw; bottom: -18vw; border: 1.5px dashed rgba(255, 255, 255, .14); }
+.sk-ring-1 { width: 62vw; right: -20vw; top: -26vw; border: 1.5px solid rgba(255, 255, 255, .6); }
+.sk-ring-2 { width: 40vw; left: -16vw; bottom: -18vw; border: 1.5px dashed rgba(255, 255, 255, .6); }
 .sk-main { position: relative; z-index: 1; }
 
-/* 毛玻璃胶囊顶栏：固定在顶部，滚出首屏后加深为蓝色玻璃 */
+/* 毛玻璃胶囊顶栏：固定在顶部，滚出首屏后变成更实的白色玻璃 */
 .sk-header-wrap {
   position: fixed; top: 0; left: 0; right: 0; z-index: 50; padding: 18px 28px 0;
-  color: var(--sk-cream); pointer-events: none;
+  color: var(--sk-ink); pointer-events: none;
 }
 .sk-header-wrap .sk-header { pointer-events: auto; transition: background .3s ease, border-color .3s ease; }
-.sk-header-wrap.is-scrolled .sk-header { background: rgba(43, 55, 255, .78); border-color: rgba(255, 255, 255, .3); }
+.sk-header-wrap.is-scrolled .sk-header { background: rgba(255, 255, 255, .86); border-color: var(--sk-lilac-soft); }
 .sk-header {
   display: flex; justify-content: space-between; align-items: center; height: 62px; padding: 0 8px;
   border-radius: 100px; font-size: 15px;
-  background: rgba(255, 255, 255, .1); border: 1px solid rgba(255, 255, 255, .24);
+  background: rgba(255, 255, 255, .5); border: 1px solid rgba(255, 255, 255, .85);
   backdrop-filter: blur(18px) saturate(140%); -webkit-backdrop-filter: blur(18px) saturate(140%);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .28), 0 12px 32px -14px rgba(14, 15, 44, .45);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .9), 0 14px 32px -18px rgba(90, 62, 214, .45);
 }
 .sk-logo { display: inline-flex; align-items: center; gap: 10px; font-weight: 800; font-size: 21px; letter-spacing: -0.03em; }
 .sk-logo-mark {
   display: grid; place-items: center; width: 46px; height: 46px; border-radius: 50%;
-  background: var(--sk-cream); color: var(--sk-blue); font-size: 22px; font-weight: 800;
+  background: var(--sk-violet); color: var(--sk-white); font-size: 22px; font-weight: 800;
 }
 .sk-nav { display: flex; justify-content: flex-end; align-items: center; gap: 4px; font-weight: 500; }
 .sk-nav a {
   display: inline-flex; align-items: center; height: 46px; padding: 0 18px; border-radius: 100px;
   transition: background .2s;
 }
-.sk-nav a:hover { background: rgba(255, 255, 255, .12); }
-.sk-nav .sk-nav-gh { background: var(--sk-cream); color: var(--sk-ink); }
-.sk-nav .sk-nav-gh:hover { background: #fff; }
+.sk-nav a:hover { background: rgba(124, 92, 245, .1); }
+.sk-nav .sk-nav-gh { background: var(--sk-violet); color: var(--sk-white); }
+.sk-nav .sk-nav-gh:hover { background: var(--sk-violet-deep); }
 
 .sk-main { flex: 1; display: flex; flex-direction: column; justify-content: space-between; padding: 0 36px 36px; }
 
@@ -54,6 +86,11 @@ html { scroll-behavior: smooth; }
   font-weight: 800; line-height: .78; letter-spacing: -0.045em; text-align: center;
   font-size: clamp(120px, 27.5vw, 420px); padding: .06em 0 .02em; user-select: none;
   font-variation-settings: 'opsz' 96;
+  /* 白到淡紫的渐变字，下面叠三层由浅到深的紫色做出厚度，最后一层是落在背景上的大阴影 */
+  background: linear-gradient(180deg, #fff 35%, #f1ebff 100%);
+  -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 3px 0 #ddd1ff) drop-shadow(0 3px 0 #bba5ff) drop-shadow(0 3px 0 #9a7cff)
+    drop-shadow(0 34px 44px rgba(76, 46, 200, .5));
 }
 .sk-stickers { position: absolute; inset: 0; }
 
@@ -63,7 +100,7 @@ html { scroll-behavior: smooth; }
   background: radial-gradient(circle at 30% 25%, rgba(255, 255, 255, .5), rgba(255, 255, 255, .12) 42%, rgba(255, 255, 255, .04) 72%);
   border: 1px solid rgba(255, 255, 255, .42);
   backdrop-filter: blur(10px) saturate(150%); -webkit-backdrop-filter: blur(10px) saturate(150%);
-  box-shadow: inset 0 2px 2px rgba(255, 255, 255, .55), inset 0 -24px 48px rgba(43, 55, 255, .28), 0 30px 60px -24px rgba(14, 15, 44, .5);
+  box-shadow: inset 0 2px 2px rgba(255, 255, 255, .7), inset 0 -24px 48px rgba(124, 92, 245, .22), 0 30px 60px -24px rgba(90, 62, 214, .45);
   animation: sk-float 9s ease-in-out infinite alternate;
 }
 .sk-orb-1 { width: 17vw; left: 55%; top: -16%; }
@@ -72,8 +109,8 @@ html { scroll-behavior: smooth; }
 .sk-sticker {
   position: absolute; display: flex; align-items: center; gap: 10px;
   padding: 10px 16px 10px 10px; border-radius: 16px; color: var(--sk-ink);
-  border: 3px solid var(--sk-cream);
-  box-shadow: 0 10px 0 -2px rgba(14, 15, 44, .28), 0 18px 30px -10px rgba(14, 15, 44, .45);
+  border: 3px solid var(--sk-white);
+  box-shadow: 0 10px 0 -2px rgba(90, 62, 214, .18), 0 18px 30px -12px rgba(90, 62, 214, .45);
   transform: rotate(var(--r)); cursor: grab; touch-action: none; user-select: none;
   transition: transform .2s cubic-bezier(.3, 1.6, .5, 1), box-shadow .2s;
   animation: sk-pop .6s cubic-bezier(.3, 1.6, .5, 1) backwards;
@@ -83,19 +120,19 @@ html { scroll-behavior: smooth; }
 .sk-sticker:nth-child(4) { animation-delay: .24s; }
 .sk-sticker:nth-child(5) { animation-delay: .32s; }
 .sk-sticker:hover { transform: rotate(var(--r)) scale(1.06); }
-.sk-sticker:active { cursor: grabbing; transform: rotate(0deg) scale(1.1); box-shadow: 0 16px 0 -2px rgba(14, 15, 44, .22), 0 30px 40px -12px rgba(14, 15, 44, .5); }
+.sk-sticker:active { cursor: grabbing; transform: rotate(0deg) scale(1.1); box-shadow: 0 16px 0 -2px rgba(90, 62, 214, .16), 0 30px 40px -12px rgba(90, 62, 214, .5); }
 .sk-sticker-icon {
   display: grid; place-items: center; width: 38px; height: 38px; border-radius: 11px;
-  background: var(--sk-ink); color: var(--sk-cream); font-size: 18px;
+  background: var(--sk-ink); color: var(--sk-white); font-size: 18px;
 }
 .sk-sticker-text { display: flex; flex-direction: column; line-height: 1.15; }
 .sk-sticker-text small { font-family: 'JetBrains Mono', monospace; font-size: 11px; opacity: .7; }
-.sk-sticker-text b { font-size: 19px; font-weight: 700; letter-spacing: -0.02em; }
+.sk-sticker-text b { font-size: 19px; font-weight: 700; letter-spacing: -0.02em; white-space: nowrap; }
 .sk-sticker.is-glass {
-  color: var(--sk-cream); background: rgba(255, 255, 255, .16); border-color: rgba(255, 255, 255, .55);
+  color: var(--sk-ink); background: rgba(255, 255, 255, .42); border-color: rgba(255, 255, 255, .9);
   backdrop-filter: blur(14px) saturate(150%); -webkit-backdrop-filter: blur(14px) saturate(150%);
 }
-.sk-sticker.is-glass .sk-sticker-icon { background: var(--sk-cream); color: var(--sk-blue); }
+.sk-sticker.is-glass .sk-sticker-icon { background: var(--sk-violet); color: var(--sk-white); }
 @keyframes sk-pop { from { opacity: 0; transform: rotate(var(--r)) scale(.4); } }
 
 .sk-bottom { display: flex; align-items: flex-end; justify-content: space-between; gap: 32px; flex-wrap: wrap; margin-top: 32px; }
@@ -104,23 +141,23 @@ html { scroll-behavior: smooth; }
 .sk-actions { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
 .sk-cmd {
   display: flex; align-items: center; gap: 12px; height: 56px; padding: 0 8px 0 20px; border-radius: 16px;
-  color: var(--sk-cream); background: rgba(255, 255, 255, .12); border: 1px solid rgba(255, 255, 255, .3);
+  color: var(--sk-ink); background: rgba(255, 255, 255, .55); border: 1px solid rgba(255, 255, 255, .9);
   backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .25);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .9), 0 12px 28px -18px rgba(90, 62, 214, .5);
 }
 .sk-cmd code { font-family: 'JetBrains Mono', monospace; font-size: 15px; white-space: nowrap; }
 .sk-cmd code span { opacity: .5; margin-right: 10px; }
 .sk-cmd button {
   height: 40px; min-width: 56px; padding: 0 14px; border-radius: 11px;
-  background: var(--sk-cream); color: var(--sk-ink); font-size: 13px; font-weight: 600;
+  background: var(--sk-violet); color: var(--sk-white); font-size: 13px; font-weight: 600;
 }
 .sk-btn {
   display: inline-flex; align-items: center; height: 56px; padding: 0 26px; border-radius: 16px;
-  background: #ffe14a; color: var(--sk-ink); font-size: 17px; font-weight: 700;
-  box-shadow: 0 6px 0 #c9a800; transition: transform .12s, box-shadow .12s;
+  background: var(--sk-violet); color: var(--sk-white); font-size: 17px; font-weight: 700;
+  box-shadow: 0 6px 0 var(--sk-violet-deep); transition: transform .12s, box-shadow .12s;
 }
-.sk-btn:hover { transform: translateY(2px); box-shadow: 0 4px 0 #c9a800; }
-.sk-btn:active { transform: translateY(6px); box-shadow: 0 0 0 #c9a800; }
+.sk-btn:hover { transform: translateY(2px); box-shadow: 0 4px 0 var(--sk-violet-deep); }
+.sk-btn:active { transform: translateY(6px); box-shadow: 0 0 0 var(--sk-violet-deep); }
 
 @media (max-width: 860px) {
   .sk-header-wrap { padding: 12px 12px 0; }
@@ -146,5 +183,5 @@ html { scroll-behavior: smooth; }
   .sk-btn { justify-content: center; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .sk-sticker, .sk-orb { animation: none; transition: none; }
+  .sk-sticker, .sk-orb, .sk::before, .doc-hero::before { animation: none; transition: none; }
 }

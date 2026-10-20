@@ -3,7 +3,7 @@ import LogoIcon from './LogoIcon.jsx'
 import Code from './Code.jsx'
 import './sections.css'
 
-const ACTION_COLOR = { inject: '#86f7cb', warn: '#ffe14a', block: '#ff7a45' }
+const ACTION_COLOR = { inject: '#c9f2e1', warn: '#fff0a6', block: '#ffcfc2' }
 
 const NO_FORCE_PUSH = `---
 target: tool
@@ -46,7 +46,7 @@ function SectionHead({ title, sub }) {
 
 export function Intro() {
   return (
-    <section className="sec sec-cream" id="start">
+    <section className="sec sec-mist" id="start">
       <div className="sec-inner">
         <SectionHead title="什么是 STYLE" sub="通过几行规则调整 Claude Code、Codex 等 harness 的行为，使其符合你的使用习惯。" />
         <div className="steps">

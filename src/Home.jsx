@@ -7,13 +7,14 @@ import './home.css'
 // 贴纸位置固定：x / y 是相对字标区域的百分比位置，r 是旋转角度。最后一个是毛玻璃款
 const SLOTS = [
   { x: 3, y: 6, r: -9 },
-  { x: 74, y: 2, r: 7 },
-  { x: 78, y: 66, r: -6 },
+  { x: 70, y: 2, r: 7 },
+  { x: 72, y: 66, r: -6 },
   { x: 8, y: 70, r: 5 },
   { x: 44, y: -4, r: -3, glass: true },
 ]
 
-const COLORS = ['#ffe14a', '#ff9ade', '#86f7cb', '#ff7a45', '#a8b6ff', '#d4f56a']
+// 浅色贴纸底色，在淡紫首屏上都能看清
+const COLORS = ['#fff1a8', '#ffd3ec', '#c9f2e1', '#ffd9c2', '#e4dbff', '#d3e4ff']
 
 // 贴纸内容池，每次加载随机抽几张；name 保持短，避免右侧贴纸出界
 const POOL = [
