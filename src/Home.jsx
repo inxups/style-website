@@ -91,7 +91,6 @@ export default function Home() {
         <header className="sk-header">
           <a className="sk-logo" href="#top"><span className="sk-logo-mark"><LogoIcon /></span>STYLE</a>
           <nav className="sk-nav">
-            <a href={DOCS_URL}>文档</a>
             <a className="sk-nav-gh" href={REPO_URL} target="_blank" rel="noreferrer">GitHub ↗</a>
           </nav>
         </header>
@@ -121,7 +120,7 @@ export default function Home() {
                 <code><span>$</span>{INSTALL_CMD}</code>
                 <button onClick={() => copy()} aria-label="复制命令">{copied ? '✓' : '复制'}</button>
               </div>
-              <a className="sk-btn" href="#start">开始使用 →</a>
+              <a className="sk-btn" href={DOCS_URL}>打开文档 →</a>
             </div>
           </div>
         </main>
