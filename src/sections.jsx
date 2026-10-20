@@ -82,7 +82,6 @@ export function Footer() {
         <span className="foot-note">支持 Claude Code · Codex</span>
         <nav>
           <a href={DOCS_URL}>文档</a>
-          <a href="#start">快速介绍</a>
           <a href={REPO_URL} target="_blank" rel="noreferrer">GitHub</a>
         </nav>
       </div>
