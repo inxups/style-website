@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { DOCS_URL, INSTALL_CMD, REPO_URL, useCopy } from './shared.js'
 import LogoIcon from './LogoIcon.jsx'
-import { QuickStart, Footer } from './sections.jsx'
+import { Intro, Footer } from './sections.jsx'
 import './home.css'
 
 // x / y 是相对字标区域的百分比位置，r 是旋转角度
@@ -127,7 +127,7 @@ export default function Home() {
         </main>
       </section>
 
-      <QuickStart />
+      <Intro />
       <Footer />
     </>
   )

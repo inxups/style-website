@@ -5,65 +5,68 @@ import './sections.css'
 
 const ACTION_COLOR = { inject: '#86f7cb', warn: '#ffe14a', block: '#ff7a45' }
 
-const RULE = `rules:
-  - id: no-force-push
-    target: tool
-    tool: shell
-    action: block
-    when:
-      conditions:
-        - { field: tool.input.command, op: regex, pattern: 'git\\s+push.*--force' }
-    text: 本仓库不允许 force push，请改用新提交。`
+const NO_FORCE_PUSH = `---
+target: tool
+tool: shell
+action: block
+when:
+  conditions:
+    - field: tool.input.command
+      op: shell_regex
+      pattern: '^git push.*--force'
+---
+禁止 force push，请改用新提交。`
 
-function SectionHead({ index, label, title, sub }) {
+const NO_TODO = `---
+target: tool
+tool: [file.edit, file.write]
+action: warn
+when:
+  conditions:
+    - field: tool.added
+      op: contains
+      pattern: TODO
+---
+请勿在代码中保留 TODO。
+未完成事项请在回复中列出。`
+
+const ANSWER = `---
+target: system
+---
+请使用中文回答，并先给出结论。`
+
+function SectionHead({ title, sub }) {
   return (
     <div className="sec-head" data-reveal>
-      <span className="sec-label">{index} / {label}</span>
       <h2 className="sec-title">{title}</h2>
       {sub && <p className="sec-sub">{sub}</p>}
     </div>
   )
 }
 
-function CmdLine({ cmd }) {
-  const [copied, copy] = useCopy()
-  return (
-    <div className="code code-cmd">
-      <code><span className="tk-c">$</span> {cmd}</code>
-      <button onClick={() => copy(cmd)}>{copied ? '已复制' : '复制'}</button>
-    </div>
-  )
-}
-
-export function QuickStart() {
+export function Intro() {
   return (
     <section className="sec sec-cream" id="start">
       <div className="sec-inner">
-        <SectionHead index="01" label="快速介绍" title="三步，给 Agent 立规矩" sub="不改 agent 本身，也不用学新工具。写好规则、装上，之后照常对话。" />
+        <SectionHead title="什么是 STYLE" sub="通过几行规则调整 Claude Code、Codex 等 harness 的行为，使其符合你的使用习惯。" />
         <div className="steps">
           <article className="step" data-reveal>
-            <span className="step-n">1</span>
-            <h3>创建风格包</h3>
-            <p>生成 STYLE.yaml、prompts/ 和 rules/ 骨架。</p>
-            <CmdLine cmd="style init my-style" />
+            <span className="step-tag" style={{ background: ACTION_COLOR.block }}>block</span>
+            <h3>阻止 force push</h3>
+            <p>Agent 执行 git push --force 时，拒绝该调用，并以规则正文作为拒绝理由。</p>
+            <Code lang="md" title="rules/no-force-push.md">{NO_FORCE_PUSH}</Code>
           </article>
           <article className="step" data-reveal>
-            <span className="step-n">2</span>
-            <h3>写规则</h3>
-            <p>说清楚挂在哪、什么条件、做什么。</p>
-            <Code lang="yaml">{RULE}</Code>
+            <span className="step-tag" style={{ background: ACTION_COLOR.warn }}>warn</span>
+            <h3>提示新增 TODO</h3>
+            <p>代码改动中新增 TODO 时，向用户显示完整提示，并将首句传给 Agent。</p>
+            <Code lang="md" title="rules/no-todo.md">{NO_TODO}</Code>
           </article>
           <article className="step" data-reveal>
-            <span className="step-n">3</span>
-            <h3>装上</h3>
-            <p>自动检测 Claude Code 和 Codex，注册 hooks。</p>
-            <CmdLine cmd={INSTALL_CMD} />
-            <pre className="code code-log">
-              <span className="log-prompt">› 整理分支后推送</span>
-              <span><b style={{ background: ACTION_COLOR.block }}>block</b>已拦截 git push --force</span>
-              <span><b style={{ background: ACTION_COLOR.warn }}>warn</b>新增了 TODO，已提醒</span>
-              <span><b style={{ background: ACTION_COLOR.inject }}>inject</b>先给结论（常驻）</span>
-            </pre>
+            <span className="step-tag" style={{ background: ACTION_COLOR.inject }}>inject</span>
+            <h3>统一回答规范</h3>
+            <p>在每个会话中向 Agent 提供固定约定，例如回答语言和格式。</p>
+            <Code lang="md" title="rules/answer.md">{ANSWER}</Code>
           </article>
         </div>
       </div>

@@ -9,7 +9,7 @@
   border: 1.5px solid currentColor; opacity: .75;
 }
 .sec-title {
-  margin-top: 22px; font-weight: 800; letter-spacing: -0.035em; line-height: 1.02;
+  font-weight: 800; letter-spacing: -0.035em; line-height: 1.02;
   font-size: clamp(40px, 6vw, 84px); font-variation-settings: 'opsz' 96;
 }
 .sec-sub { margin-top: 20px; font-size: 19px; line-height: 1.65; opacity: .72; max-width: 560px; }
@@ -49,24 +49,12 @@
 }
 .step:nth-child(2) { transition-delay: .08s; }
 .step:nth-child(3) { transition-delay: .16s; }
-.step-n {
-  display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%;
-  background: var(--sk-blue); color: var(--sk-cream); font-weight: 800; font-size: 20px;
+.step-tag {
+  align-self: flex-start; padding: 4px 12px; border-radius: 100px; border: 2px solid var(--sk-ink);
+  font-family: var(--sk-mono); font-size: 13px; font-weight: 600; color: var(--sk-ink);
 }
 .step h3 { margin-top: 8px; font-size: 26px; font-weight: 800; letter-spacing: -0.02em; }
 .step p { font-size: 15px; line-height: 1.6; color: #4a4c6b; margin-bottom: 8px; }
-.code-cmd { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 10px 10px 18px; }
-.code-cmd code { white-space: nowrap; overflow-x: auto; scrollbar-width: none; }
-.code-cmd button {
-  flex: none; height: 34px; padding: 0 12px; border-radius: 10px; font-size: 12px; font-weight: 600;
-  background: var(--sk-cream); color: var(--sk-ink);
-}
-.code-log { display: flex; flex-direction: column; gap: 8px; }
-.code-log span { display: flex; align-items: center; gap: 10px; }
-.code-log .log-prompt { color: #fff; margin-bottom: 4px; }
-.code-log b {
-  padding: 1px 8px; border-radius: 6px; font-weight: 600; font-size: 12px; color: var(--sk-ink);
-}
 
 /* ---------- 页脚 ---------- */
 .foot { background: var(--sk-ink); color: var(--sk-cream); padding: 120px 36px 40px; }
@@ -93,6 +81,8 @@
   .sec-head { margin-bottom: 40px; }
   .sec-sub { font-size: 17px; }
   .steps { grid-template-columns: 1fr; }
+  .step { padding: 22px; }
+  .step .code { padding: 16px; font-size: 12.5px; }
   .foot { padding: 88px 16px 32px; }
   .foot-actions, .foot-actions .sk-cmd, .foot-actions .sk-btn { width: 100%; }
   .foot-actions .sk-cmd { justify-content: space-between; }
