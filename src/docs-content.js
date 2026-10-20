@@ -1,5 +1,6 @@
 import { marked } from 'marked'
 import README from '../docs/README.md?raw'
+import { LAYERS as LAYER_DEFS } from './docs-layers.js'
 
 // docs/style-yaml/*.md 是唯一的内容来源，页面顺序按 README 目录表
 const RAW = import.meta.glob('../docs/style-yaml/*.md', { query: '?raw', import: 'default', eager: true })
@@ -56,15 +57,29 @@ function parsePage(slug) {
     }
   }
 
-  const short = title.split(/[：:]/)[0].trim()
-  return { slug, title, short, lead, tokens: rest, fields, toc: fields.length ? fields : sections }
+  const [short, ...more] = title.split(/[：:]/).map((x) => x.trim())
+  return { slug, title, short, sub: more.join('：'), lead, tokens: rest, fields, toc: fields.length ? fields : sections }
 }
 
 export const PAGES = ORDER.map(parsePage)
 
-// 页面之间的 .md 链接改成本页锚点
+export const DOCS_HOME = `${import.meta.env.BASE_URL}docs/`
+export const layerUrl = (slug) => `${DOCS_HOME}${slug}/`
+
+// 按层分组；没分到任何层的新页面放进最后一层，避免页面从站点上消失
+const bySlug = Object.fromEntries(PAGES.map((p) => [p.slug, p]))
+const placed = new Set(LAYER_DEFS.flatMap((l) => l.pages))
+const unplaced = ORDER.filter((s) => !placed.has(s))
+export const LAYERS = LAYER_DEFS.map((l, i) => ({
+  ...l,
+  pages: [...l.pages, ...(i === LAYER_DEFS.length - 1 ? unplaced : [])].filter((s) => bySlug[s]).map((s) => bySlug[s]),
+}))
+const layerOf = Object.fromEntries(LAYERS.flatMap((l) => l.pages.map((p) => [p.slug, l.slug])))
+
+// 页面之间的 .md 链接改成对应层页面上的锚点
 export function resolveHref(href) {
   const m = href.match(/^(?:\.\/)?(?:style-yaml\/)?([\w-]+)\.md(?:#(.*))?$/)
-  if (!m || !ORDER.includes(m[1])) return href
-  return m[2] ? `#${m[1]}--${anchor(decodeURIComponent(m[2]))}` : `#${m[1]}`
+  if (!m || !layerOf[m[1]]) return href
+  const id = m[2] ? `${m[1]}--${anchor(decodeURIComponent(m[2]))}` : m[1]
+  return `${layerUrl(layerOf[m[1]])}#${id}`
 }

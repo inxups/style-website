@@ -1,6 +1,6 @@
 import { Fragment, useEffect, useRef, useState } from 'react'
 import { REPO_URL } from './shared.js'
-import { PAGES, resolveHref } from './docs-content.js'
+import { DOCS_HOME, LAYERS, layerUrl, resolveHref } from './docs-content.js'
 import LogoIcon from './LogoIcon.jsx'
 import Code from './Code.jsx'
 import './home.css'
@@ -9,8 +9,17 @@ import './docs.css'
 
 const HOME = import.meta.env.BASE_URL
 
-// 每个 md 页面是一组，组内是字段或小节
-const TOC = PAGES.map((p) => ({ id: p.slug, group: p.short, items: p.toc }))
+// 地址 docs/<slug>/ 对应一层，docs/ 本身是概览
+const LAYER = LAYERS.find((l) => location.pathname.startsWith(layerUrl(l.slug))) ?? null
+const LAYER_INDEX = LAYERS.indexOf(LAYER)
+
+// 页面编号按所有层的先后顺序
+const PAGE_NO = Object.fromEntries(LAYERS.flatMap((l) => l.pages).map((p, i) => [p.slug, i]))
+
+// 当前层里每个 md 页面是一组，组内是字段或小节
+const TOC = (LAYER?.pages ?? []).map((p) => ({ id: p.slug, group: p.short, items: p.toc }))
+
+const pad = (n) => String(n).padStart(2, '0')
 
 const LANG = { yml: 'yaml', yaml: 'yaml', sh: 'bash', bash: 'bash', shell: 'bash', console: 'bash', json: 'json', md: 'md', markdown: 'md' }
 
@@ -167,7 +176,7 @@ function Field({ heading, body }) {
 
 /* ---------- 页面 ---------- */
 
-function Page({ page, index }) {
+function Page({ page }) {
   const out = []
   const { tokens } = page
   let h2 = ''
@@ -214,7 +223,7 @@ function Page({ page, index }) {
   return (
     <>
       <h2 className="doc-h2" id={page.slug}>
-        <span className="doc-kicker">{String(index).padStart(2, '0')} · {page.slug}.md</span>
+        <span className="doc-kicker">{pad(PAGE_NO[page.slug])} · {page.slug}.md</span>
         {page.title}
       </h2>
       {page.lead && <div className="doc-lead">{blocks(page.lead)}</div>}
@@ -228,6 +237,7 @@ function useActiveSection() {
   useEffect(() => {
     // 当前章节 = 最后一个顶边已经过了顶栏下沿的标题
     const els = TOC.flatMap((g) => [g.id, ...g.items.map(([id]) => id)]).map((id) => document.getElementById(id)).filter(Boolean)
+    if (!els.length) return
     let raf = 0
     const update = () => {
       raf = 0
@@ -249,30 +259,104 @@ function useActiveSection() {
   return active
 }
 
+// 侧边目录：当前层展开到字段，其他层只列层名
 function TocList({ active, onPick }) {
-  return TOC.map((g) => (
-    <div className="toc-group" key={g.id}>
-      <a href={`#${g.id}`} className={`toc-title ${active === g.id ? 'is-active' : ''}`} onClick={onPick}>{g.group}</a>
-      {g.items.map(([id, label]) => (
-        <a key={id} href={`#${id}`} className={active === id ? 'is-active' : ''} onClick={onPick}>{label}</a>
-      ))}
-    </div>
-  ))
+  return (
+    <>
+      <a className="toc-back" href={DOCS_HOME}>← 文档概览</a>
+      {LAYERS.map((l, i) => (l === LAYER ? (
+        <div className="toc-layer is-current" key={l.slug}>
+          <span className="toc-layer-name"><i>{pad(i + 1)}</i>{l.title}</span>
+          {TOC.map((g) => (
+            <div className="toc-group" key={g.id}>
+              <a href={`#${g.id}`} className={`toc-title ${active === g.id ? 'is-active' : ''}`} onClick={onPick}>{g.group}</a>
+              {g.items.map(([id, label]) => (
+                <a key={id} href={`#${id}`} className={active === id ? 'is-active' : ''} onClick={onPick}>{label}</a>
+              ))}
+            </div>
+          ))}
+        </div>
+      ) : (
+        <a className="toc-layer" key={l.slug} href={layerUrl(l.slug)}><i>{pad(i + 1)}</i>{l.title}</a>
+      )))}
+    </>
+  )
 }
 
-export default function Docs() {
+function Header() {
+  return (
+    <div className="sk-header-wrap is-scrolled">
+      <header className="sk-header">
+        <a className="sk-logo" href={HOME}><span className="sk-logo-mark"><LogoIcon /></span>STYLE</a>
+        <nav className="sk-nav">
+          <a href={HOME} className="doc-nav-home">首页</a>
+          {LAYER && <a href={DOCS_HOME}>文档概览</a>}
+          <a className="sk-nav-gh" href={REPO_URL} target="_blank" rel="noreferrer">GitHub ↗</a>
+        </nav>
+      </header>
+    </div>
+  )
+}
+
+/* ---------- 概览页 ---------- */
+
+function Overview() {
+  return (
+    <>
+      <section className="doc-hero">
+        <span className="sk-ring sk-ring-1" aria-hidden="true" />
+        <div className="doc-hero-inner">
+          <span className="sec-label">文档 · spec style/v0.3</span>
+          <h1>STYLE 文档</h1>
+          <p>从包的结构讲起，依次是包级字段、规则、原生 hook，最后是命令行和诊断码。每个字段都列出位置、类型、默认值和校验时会报的诊断码。</p>
+          <div className="doc-hero-links">
+            <a className="sk-btn" href={layerUrl(LAYERS[0].slug)}>从{LAYERS[0].title}开始 →</a>
+            <a className="doc-ghost" href={resolveHref('diagnostics.md')}>诊断码</a>
+          </div>
+        </div>
+      </section>
+
+      <div className="doc-overview">
+        <div className="doc-layers">
+          {LAYERS.map((l, i) => (
+            <section className="doc-layer" key={l.slug}>
+              <a className="doc-layer-head" href={layerUrl(l.slug)}>
+                <span className="doc-layer-no">{pad(i + 1)}</span>
+                <h2>{l.title}</h2>
+                <span className="doc-layer-go" aria-hidden="true">→</span>
+              </a>
+              <p className="doc-layer-desc">{l.desc}</p>
+              <ul className="doc-layer-pages">
+                {l.pages.map((p) => (
+                  <li key={p.slug}>
+                    <a href={`${layerUrl(l.slug)}#${p.slug}`}>
+                      <b>{p.short}</b>
+                      <span>{p.sub}</span>
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          ))}
+        </div>
+
+        <div className="doc-end">
+          <p>规范、示例和源码都在 GitHub。</p>
+          <a className="sk-btn" href={REPO_URL} target="_blank" rel="noreferrer">inxups/style-cli ↗</a>
+        </div>
+      </div>
+    </>
+  )
+}
+
+/* ---------- 分层页 ---------- */
+
+function LayerPage() {
   const active = useActiveSection()
   const [open, setOpen] = useState(false)
   const tocRef = useRef(null)
-
-  // 内容由 React 渲染，浏览器加载时找不到锚点，这里补一次跳转
-  useEffect(() => {
-    const id = decodeURIComponent(location.hash.slice(1))
-    if (!id) return
-    const jump = () => document.getElementById(id)?.scrollIntoView({ behavior: 'instant' })
-    jump()
-    document.fonts?.ready.then(jump) // 字体加载后行高会变，再校准一次
-  }, [])
+  const prev = LAYERS[LAYER_INDEX - 1]
+  const next = LAYERS[LAYER_INDEX + 1]
 
   // 侧边目录跟着当前章节滚动，只滚目录自己
   useEffect(() => {
@@ -287,28 +371,12 @@ export default function Docs() {
 
   return (
     <>
-      <div className="sk-header-wrap is-scrolled">
-        <header className="sk-header">
-          <a className="sk-logo" href={HOME}><span className="sk-logo-mark"><LogoIcon /></span>STYLE</a>
-          <nav className="sk-nav">
-            <a href={HOME} className="doc-nav-home">首页</a>
-            <a href="#package">包字段</a>
-            <a href="#rules" className="doc-nav-ref">规则字段</a>
-            <a className="sk-nav-gh" href={REPO_URL} target="_blank" rel="noreferrer">GitHub ↗</a>
-          </nav>
-        </header>
-      </div>
-
-      <section className="doc-hero">
+      <section className="doc-hero is-layer">
         <span className="sk-ring sk-ring-1" aria-hidden="true" />
         <div className="doc-hero-inner">
-          <span className="sec-label">参考 · spec style/v0.3</span>
-          <h1>STYLE.yaml<br />参考</h1>
-          <p>包的形态、包级字段、规则字段、条件、原生 hook 和诊断码。每个字段列出位置、类型、默认值和校验时会报的诊断码。</p>
-          <div className="doc-hero-links">
-            <a className="sk-btn" href="#overview">包的形态 →</a>
-            <a className="doc-ghost" href="#diagnostics">诊断码</a>
-          </div>
+          <span className="sec-label">文档 · {pad(LAYER_INDEX + 1)} / {pad(LAYERS.length)}</span>
+          <h1>{LAYER.title}</h1>
+          <p>{LAYER.desc}</p>
         </div>
       </section>
 
@@ -318,19 +386,45 @@ export default function Docs() {
         </aside>
 
         <details className="doc-toc-mobile" open={open} onToggle={(e) => setOpen(e.currentTarget.open)}>
-          <summary>目录</summary>
+          <summary>目录 · {LAYER.title}</summary>
           <TocList active={active} onPick={() => setOpen(false)} />
         </details>
 
         <article className="doc">
-          {PAGES.map((p, i) => <Page key={p.slug} page={p} index={i} />)}
+          {LAYER.pages.map((p) => <Page key={p.slug} page={p} />)}
 
-          <div className="doc-end">
-            <p>规范、示例和源码都在 GitHub。</p>
-            <a className="sk-btn" href={REPO_URL} target="_blank" rel="noreferrer">inxups/style-cli ↗</a>
-          </div>
+          <nav className="doc-pager">
+            {prev ? (
+              <a href={layerUrl(prev.slug)}><small>← 上一层</small><b>{prev.title}</b></a>
+            ) : (
+              <a href={DOCS_HOME}><small>← 返回</small><b>文档概览</b></a>
+            )}
+            {next && <a className="is-next" href={layerUrl(next.slug)}><small>下一层 →</small><b>{next.title}</b></a>}
+          </nav>
         </article>
       </div>
+    </>
+  )
+}
+
+export default function Docs() {
+  useEffect(() => {
+    document.title = LAYER ? `${LAYER.title} · STYLE 文档` : 'STYLE 文档'
+  }, [])
+
+  // 内容由 React 渲染，浏览器加载时找不到锚点，这里补一次跳转
+  useEffect(() => {
+    const id = decodeURIComponent(location.hash.slice(1))
+    if (!id) return
+    const jump = () => document.getElementById(id)?.scrollIntoView({ behavior: 'instant' })
+    jump()
+    document.fonts?.ready.then(jump) // 字体加载后行高会变，再校准一次
+  }, [])
+
+  return (
+    <>
+      <Header />
+      {LAYER ? <LayerPage /> : <Overview />}
     </>
   )
 }
