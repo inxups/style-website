@@ -51,16 +51,16 @@ export function Intro() {
         <SectionHead title="什么是 STYLE" sub="通过几行规则调整 Claude Code、Codex 等 harness 的行为，使其符合你的使用习惯。" />
         <div className="steps">
           <article className="step" data-reveal>
-            <span className="step-tag" style={{ background: ACTION_COLOR.block }}>block</span>
-            <h3>阻止 force push</h3>
-            <p>Agent 执行 git push --force 时，拒绝该调用，并以规则正文作为拒绝理由。</p>
-            <Code lang="md" title="rules/no-force-push.md">{NO_FORCE_PUSH}</Code>
-          </article>
-          <article className="step" data-reveal>
             <span className="step-tag" style={{ background: ACTION_COLOR.warn }}>warn</span>
             <h3>提示新增 TODO</h3>
             <p>代码改动中新增 TODO 时，向用户显示完整提示，并将首句传给 Agent。</p>
             <Code lang="md" title="rules/no-todo.md">{NO_TODO}</Code>
+          </article>
+          <article className="step" data-reveal>
+            <span className="step-tag" style={{ background: ACTION_COLOR.block }}>block</span>
+            <h3>阻止 force push</h3>
+            <p>Agent 执行 git push --force 时，拒绝该调用，并以规则正文作为拒绝理由。</p>
+            <Code lang="md" title="rules/no-force-push.md">{NO_FORCE_PUSH}</Code>
           </article>
           <article className="step" data-reveal>
             <span className="step-tag" style={{ background: ACTION_COLOR.inject }}>inject</span>
