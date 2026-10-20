@@ -18,15 +18,19 @@ sources:
   - core/tokens/installed.go
   - internal/app/entry.go
   - internal/app/harness_requirement.go
+  - internal/app/json_envelope.go
+  - internal/app/command.go
+  - internal/app/explain.go
+  - internal/app/registration.go
 ---
 
 # diagnostics：诊断码总表
 
-> 汇总 `style validate`、`style plan` 和安装流程报告的全部诊断码，并指向详细说明它们的页面。
+> 汇总 `style validate`、`style plan`、安装流程和其他命令报告的诊断码，并指向详细说明它们的页面。
 
 ## 概览
 
-诊断码分为三个阶段：
+包的诊断码分为三个阶段；命令执行失败时另有一组[命令诊断码](diagnostics.md#命令)：
 
 1. **加载**：读取文件、解析 YAML 和 front matter。遇到错误立即中止，一次只报告一个。
 2. **校验**：检查字段结构、取值和跨字段约束，一次报告全部问题。
@@ -41,11 +45,13 @@ sources:
 
 ### 输出格式
 
-文本输出每行一条：
+文本模式下诊断写到 stderr，每行一条：
 
 ```text
-<诊断码> <位置>: <说明>
+style <命令>: [warning ]<诊断码>[ <位置>]: <说明>
 ```
+
+warning 级诊断前加 `warning`，error 不加前缀；没有位置时省略位置。说明小写开头，不以句号结尾。完整的输出约定见 [cli.md](cli.md#输出位置)。
 
 位置的常见写法：
 
@@ -59,14 +65,15 @@ sources:
 | `rules/<name>.md` | 规则文件 |
 | `codex`、`claude-code` | 按 harness 计算的 token 诊断 |
 
-`style validate --json` 输出数组，每项包含 `code`、`path`、`severity`、`message`。
+`--json` 模式下诊断在 [JSON 报告](cli.md#json-报告) 的 `diagnostics` 数组里，每项包含 `code`、`severity`、`message`，可能有 `path`、`rule`、`provider`。
 
 ### 退出码
 
 | 退出码 | 含义 |
 |---|---|
 | 0 | 成功；只有 warning 时也是 0 |
-| 1 | 加载失败、有 error 级诊断、命令用法错误，或确认提示被取消 |
+| 1 | 加载失败、有 error 级诊断、请求被拒绝，或确认提示被取消 |
+| 2 | 命令行写错了（用法错误），见 [cli.md](cli.md#退出码) |
 | 3 | `style sync` 发现开发链接包需要审批（`style trust`） |
 | 4 | 计划被拒绝：有规则为 `install-error`，或 `T002` / `T004` 为 error（`T001` 为 error 时校验就失败，退出码为 1） |
 
@@ -201,6 +208,35 @@ sources:
 
 计划状态（`native`、`degraded`、`partial`、`skipped`、`never-trigger`、`native-hook`、`install-error`）的含义见 [fallback.md](fallback.md#计划状态)。
 
+### 命令
+
+命令失败时报告的诊断码。脚本应当按这些码判断失败原因，不要解析说明文字。详见 [cli.md](cli.md)。
+
+| 诊断码 | 级别 | 触发条件 |
+|---|---|---|
+| `source-invalid` | error | 来源地址或 `--ref` 格式错误（退出码 2）；拉取后包路径或 ref 不存在（退出码 1） |
+| `request-rejected` | error | 请求无法满足：包未安装、`--all` 而没有安装任何包、对非 Git 包使用 `--ref` 等 |
+| `confirmation-declined` | error | 确认提示没有回答 `y`，没有做任何修改 |
+| `blocked` | error | 计划、安装、恢复或更新被阻止，退出码 4 |
+| `conflict` | error | 与已有安装冲突 |
+| `lock-invalid` | error | `style.lock.yaml` 无法读取或不是合法的 lock |
+| `frozen-metadata-incomplete` | error | `restore` 读到的 lock 可以解析，但缺少格式或格式不受支持 |
+| `registration-required` | error | 插件已写入，但需要在 harness 里手动注册才会加载 |
+| `project-binding-invalid` | error | `--project` 指定的项目无法绑定，例如目录不存在 |
+| `probe-not-installed` | error | `probe` 时没有可读的安装 |
+| `probe-timeout` | error | `probe` 等待回调超时 |
+| `event-mismatch` | error | `explain --event` 与 payload 的 `hook_event_name` 不一致 |
+| `fail-closed-unsupported` | error | `explain --fail-closed` 用在 Claude Code 以外的 harness 上 |
+| `payload-invalid` | error | `explain` 的 payload 无法读取或格式不对 |
+| `facts-invalid` | error | `explain --facts` 文件不存在或格式不对 |
+| `index-invalid` | error | `explain --index` 文件不存在或不是有效的索引 |
+| `state-snapshot-invalid` | error | `explain --state-dir` 目录不存在或不可读 |
+| `state-snapshot-changed` | error | `explain` 读取状态时状态被改动 |
+| `provenance-unavailable` | warning | 编译来源不可用，`explain` 只按索引说明 |
+| `command-failed` | error | 错误本身没有诊断码时的兜底 |
+
+用法错误（退出码 2）不输出 JSON 报告，只在 stderr 写原因和 usage。
+
 ## 示例
 
 ```yaml
@@ -217,17 +253,30 @@ rules:
     text: Prefer rg over grep.
 ```
 
+`style validate diag-demo` 的 stderr：
+
+```text
+style validate: warning T007 STYLE.yaml#shell-guidance: inject with repeat every or turn should include reason
+```
+
 `style validate diag-demo --json`：
 
 ```json
-[
-  {
-    "code": "T007",
-    "path": "STYLE.yaml#shell-guidance",
-    "severity": "warning",
-    "message": "inject with repeat every or turn should include reason"
-  }
-]
+{
+  "format": 2,
+  "command": "validate",
+  "status": "ok",
+  "scope": {"kind": "user", "home": "/Users/me/.style"},
+  "diagnostics": [
+    {
+      "code": "T007",
+      "path": "STYLE.yaml#shell-guidance",
+      "severity": "warning",
+      "message": "inject with repeat every or turn should include reason"
+    }
+  ],
+  "result": null
+}
 ```
 
 只有 warning，退出码为 0。给规则加上 `reason` 后警告消失。
