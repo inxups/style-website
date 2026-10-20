@@ -4,14 +4,64 @@ import LogoIcon from './LogoIcon.jsx'
 import { Intro, Footer } from './sections.jsx'
 import './home.css'
 
-// x / y 是相对字标区域的百分比位置，r 是旋转角度
-const INITIAL = [
-  { id: 'block', event: 'tool.pre', name: 'no-force-push', icon: '⛨', bg: '#ffe14a', x: 3, y: 6, r: -9 },
-  { id: 'skill', event: 'skill', name: 'code-review', icon: '✎', bg: '#ff9ade', x: 74, y: 2, r: 7 },
-  { id: 'warn', event: 'tool.post', name: 'no-todo', icon: '✓', bg: '#86f7cb', x: 80, y: 66, r: -6 },
-  { id: 'system', event: 'system', name: 'terse', icon: '✂', bg: '#ff7a45', x: 8, y: 70, r: 5 },
-  { id: 'ver', event: 'style/v0.3', name: 'M1 preview', icon: '✦', glass: true, x: 44, y: -4, r: -3 },
+// 贴纸位置固定：x / y 是相对字标区域的百分比位置，r 是旋转角度。最后一个是毛玻璃款
+const SLOTS = [
+  { x: 3, y: 6, r: -9 },
+  { x: 74, y: 2, r: 7 },
+  { x: 78, y: 66, r: -6 },
+  { x: 8, y: 70, r: 5 },
+  { x: 44, y: -4, r: -3, glass: true },
 ]
+
+const COLORS = ['#ffe14a', '#ff9ade', '#86f7cb', '#ff7a45', '#a8b6ff', '#d4f56a']
+
+// 贴纸内容池，每次加载随机抽几张；name 保持短，避免右侧贴纸出界
+const POOL = [
+  { event: 'tool.pre', name: 'no-force-push', icon: '⛨' },
+  { event: 'tool.pre', name: 'no-rm-rf', icon: '⚑' },
+  { event: 'tool.pre', name: 'no-secrets', icon: '☂' },
+  { event: 'tool.post', name: 'no-todo', icon: '✓' },
+  { event: 'tool.post', name: 'run-tests', icon: '♺' },
+  { event: 'tool.post', name: 'lint-nudge', icon: '⚙' },
+  { event: 'system', name: 'terse', icon: '✂' },
+  { event: 'system', name: 'zh-answers', icon: '文' },
+  { event: 'system', name: 'plain-words', icon: '✿' },
+  { event: 'skill', name: 'code-review', icon: '✎' },
+  { event: 'skill', name: 'release', icon: '★' },
+  { event: 'mcp', name: 'pr-checklist', icon: '⌥' },
+  { event: 'mcp', name: 'ticket-link', icon: '✉' },
+  { event: 'session.start', name: 'repo-context', icon: '◎' },
+  { event: 'prompt.submitted', name: 'ask-first', icon: '⏎' },
+  { event: 'subagent.start', name: 'share-notes', icon: '✱' },
+  { event: 'harness', name: 'claude-code', icon: '⌘' },
+  { event: 'harness', name: 'codex', icon: '⌘' },
+  { event: 'style/v0.3', name: 'M1 preview', icon: '✦' },
+  { event: 'action', name: 'block', icon: '⊘' },
+]
+
+const LAST_KEY = 'style-stickers-last'
+
+function shuffle(list) {
+  const a = [...list]
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1))
+    ;[a[i], a[j]] = [a[j], a[i]]
+  }
+  return a
+}
+
+// 避开上一次出现过的贴纸，保证每次刷新都是新的一批
+function pickStickers() {
+  let last = []
+  try { last = JSON.parse(localStorage.getItem(LAST_KEY)) || [] } catch { /* 存储不可用时直接随机 */ }
+  const picked = shuffle(POOL.filter((s) => !last.includes(s.name))).slice(0, SLOTS.length)
+  try { localStorage.setItem(LAST_KEY, JSON.stringify(picked.map((s) => s.name))) } catch { /* 忽略 */ }
+  const colors = shuffle(COLORS)
+  return SLOTS.map((slot, i) => ({ ...picked[i], ...slot, id: picked[i].name, bg: slot.glass ? undefined : colors[i] }))
+}
+
+// 模块加载时抽一次，避免 StrictMode 下重复抽取
+const INITIAL = pickStickers()
 
 function Stickers() {
   const [items, setItems] = useState(INITIAL)

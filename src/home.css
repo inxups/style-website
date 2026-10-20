@@ -138,7 +138,8 @@ html { scroll-behavior: smooth; }
   .sk-sticker-text small { font-size: 9px; }
   .sk-sticker-text b { font-size: 13px; }
   .sk-sticker:nth-child(4), .sk-sticker:nth-child(5) { display: none; }
-  .sk-sticker:nth-child(3) { margin-left: -12vw; }
+  .sk-sticker:nth-child(2) { margin-left: -14vw; }
+  .sk-sticker:nth-child(3) { margin-left: -20vw; }
   .sk-actions { width: 100%; }
   .sk-cmd, .sk-btn { width: 100%; }
   .sk-cmd { justify-content: space-between; }
