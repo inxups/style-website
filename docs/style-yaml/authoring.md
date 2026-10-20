@@ -28,14 +28,14 @@ sources:
 |---|---|---|
 | 1. 校验 | `style validate` | 字段、选择器、条件、模板变量是否合法 |
 | 2. 看计划 | `style plan --harness codex,claude-code` | 每个 harness 上的落点、状态（`native` / `degraded` / `never-trigger` / `skipped`）和 token 估算 |
-| 3. 隔离安装 | `style install --link --project ... --style-home ...` | 编译出运行时索引，生成项目级 hook 配置 |
+| 3. 隔离安装 | `style --project ... --style-home ... link ...` | 编译出运行时索引，生成项目级 hook 配置 |
 | 4. 重放事件 | `style explain --payload ...` | 选择器、`when`、去重、block 和输出是否符合预期 |
 | 5. 修改后同步 | `style sync` | 链接包的普通规则修改直接生效，再回到第 4 步 |
 
 ## 行为
 
 1. **隔离环境**：项目级安装把 hook 配置写进项目目录（`.codex/hooks.json`、`.claude/settings.json`），状态写进 `--style-home`。如果 harness 的用户配置目录里已经有另一个 STYLE 主目录的安装，项目级安装会以 `project-binding-invalid` 拒绝（"harness has a user STYLE owner outside this base home"）。所以测试时还要把 `CODEX_HOME` 和 `CLAUDE_CONFIG_DIR` 指向临时目录（`internal/app/project.go`）。另外两条限制：项目目录和 STYLE 主目录不能互相包含；项目目录不能位于 harness 用户配置目录内。
-2. **链接安装**：`--link` 直接引用源码目录。第一次 `sync` 前要运行一次 `style trust` 审批快照，之后修改普通规则只需 `style sync`。修改 `native_hooks` 要重新 `trust`，见 [cli.md](cli.md)。
+2. **链接安装**：`style link` 直接引用源码目录。第一次 `style sync` 会提示审批快照，之后修改普通规则只需 `style sync`，不再提示。修改 `native_hooks` 后 `sync` 会再次提示审批，见 [cli.md](cli.md#sync)。
 3. **payload**：必须包含 `hook_event_name` 和 `session_id`，字段名和 harness 发给 hook 的原生 JSON 一致。两个 harness 的主要区别如下：
 
 | 内容 | Claude Code | Codex |
@@ -96,7 +96,7 @@ rules:
 ```bash
 T=$(mktemp -d)
 mkdir -p "$T/home" "$T/proj" "$T/codex" "$T/claude"
-s() { CODEX_HOME="$T/codex" CLAUDE_CONFIG_DIR="$T/claude" style "$@" --project "$T/proj" --style-home "$T/home"; }
+s() { CODEX_HOME="$T/codex" CLAUDE_CONFIG_DIR="$T/claude" style --project "$T/proj" --style-home "$T/home" "$@"; }
 ```
 
 校验、安装和审批（确认提示输入 `y` 回车）：
@@ -104,8 +104,8 @@ s() { CODEX_HOME="$T/codex" CLAUDE_CONFIG_DIR="$T/claude" style "$@" --project "
 ```bash
 style validate ./au-demo
 style plan ./au-demo --harness codex,claude-code
-s install ./au-demo --link --harness codex,claude-code
-s trust au-demo
+s link ./au-demo --harness codex,claude-code
+s sync
 ```
 
 ### 重放 Codex 事件
@@ -163,7 +163,7 @@ s explain --harness codex --payload pre.json   # 拒绝理由变成新正文
 
 ## 相关
 
-- [cli.md](cli.md)（`explain`、`sync`、`trust` 的全部参数）
+- [cli.md](cli.md)（`explain`、`link`、`sync` 的全部参数）
 - [action.md](action.md)（去重与 block 优先）
 - [budget.md](budget.md)（token 估算与输入上限）
 - [when.md](when.md)（条件字段在哪些事件上可用）

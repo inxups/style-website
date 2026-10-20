@@ -72,9 +72,8 @@ warning 级诊断前加 `warning`，error 不加前缀；没有位置时省略�
 | 退出码 | 含义 |
 |---|---|
 | 0 | 成功；只有 warning 时也是 0 |
-| 1 | 加载失败、有 error 级诊断、请求被拒绝，或确认提示被取消 |
+| 1 | 加载失败、有 error 级诊断、请求被拒绝，或确认、审批提示被取消 |
 | 2 | 命令行写错了（用法错误），见 [cli.md](cli.md#退出码) |
-| 3 | `style sync` 发现开发链接包需要审批（`style trust`） |
 | 4 | 计划被拒绝：有规则为 `install-error`，或 `T002` / `T004` 为 error（`T001` 为 error 时校验就失败，退出码为 1） |
 
 ## 诊断码
@@ -216,15 +215,15 @@ warning 级诊断前加 `warning`，error 不加前缀；没有位置时省略�
 |---|---|---|
 | `source-invalid` | error | 来源地址或 `--ref` 格式错误（退出码 2）；拉取后包路径或 ref 不存在（退出码 1） |
 | `request-rejected` | error | 请求无法满足：包未安装、`--all` 而没有安装任何包、对非 Git 包使用 `--ref` 等 |
-| `confirmation-declined` | error | 确认提示没有回答 `y`，没有做任何修改 |
+| `confirmation-declined` | error | 确认提示没有回答 `y`，没有做任何修改；`sync` 逐个审批时，之前已确认的包已经写入，消息会列出它们 |
 | `blocked` | error | 计划、安装、恢复或更新被阻止，退出码 4 |
 | `conflict` | error | 与已有安装冲突 |
 | `lock-invalid` | error | `style.lock.yaml` 无法读取或不是合法的 lock |
 | `frozen-metadata-incomplete` | error | `restore` 读到的 lock 可以解析，但缺少格式或格式不受支持 |
 | `registration-required` | error | 插件已写入，但需要在 harness 里手动注册才会加载 |
-| `project-binding-invalid` | error | `--project` 指定的项目无法绑定，例如目录不存在 |
-| `probe-not-installed` | error | `probe` 时没有可读的安装 |
-| `probe-timeout` | error | `probe` 等待回调超时 |
+| `project-binding-invalid` | error | 全局参数 `--project` 指定的项目无法绑定，例如目录不存在 |
+| `probe-not-installed` | error | `doctor --live` 时没有可读的安装 |
+| `probe-timeout` | error | `doctor --live` 等待回调超时 |
 | `event-mismatch` | error | `explain --event` 与 payload 的 `hook_event_name` 不一致 |
 | `fail-closed-unsupported` | error | `explain --fail-closed` 用在 Claude Code 以外的 harness 上 |
 | `payload-invalid` | error | `explain` 的 payload 无法读取或格式不对 |
