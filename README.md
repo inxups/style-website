@@ -82,3 +82,7 @@ Check that `base` in `vite.config.js` is `'/'`, then rebuild and deploy. The old
 
 **After adding a layer, visiting `docs/<slug>/` directly returns 404?**
 Layer URLs come from the `slug` values in `src/docs-layers.js`. In development a Vite middleware rewrites them to `docs/index.html`, and at build time a plugin copies the page for each slug; both only recognize slugs registered in that file.
+
+## License
+
+[MIT](LICENSE)

@@ -82,3 +82,7 @@ npm run preview   # 本地预览构建结果
 
 **新增一层后，直接访问 `docs/<slug>/` 返回 404？**
 层的地址来自 `src/docs-layers.js` 中的 `slug`。开发时由 Vite 中间件改写到 `docs/index.html`，构建时由插件为每个 slug 复制一份页面，两者都只认这个文件里登记过的 slug。
+
+## 许可证
+
+[MIT](LICENSE)
