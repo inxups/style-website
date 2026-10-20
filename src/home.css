@@ -94,20 +94,21 @@ html { scroll-behavior: smooth; }
 .sk-header-wrap .sk-header { pointer-events: auto; transition: background .3s ease, border-color .3s ease; }
 .sk-header-wrap.is-scrolled .sk-header { background: rgba(var(--sk-glass-rgb), .86); border-color: var(--sk-lilac-soft); }
 .sk-header {
-  display: flex; justify-content: space-between; align-items: center; height: 62px; padding: 0 8px;
+  display: flex; justify-content: space-between; align-items: center; height: 52px; padding: 0 6px;
   border-radius: 100px; font-size: 15px;
   background: rgba(var(--sk-glass-rgb), .5); border: 1px solid var(--sk-glass-edge);
   backdrop-filter: blur(18px) saturate(140%); -webkit-backdrop-filter: blur(18px) saturate(140%);
   box-shadow: inset 0 1px 0 var(--sk-glass-edge), 0 14px 32px -18px rgba(90, 62, 214, .45);
 }
-.sk-logo { display: inline-flex; align-items: center; gap: 10px; font-weight: 800; font-size: 21px; letter-spacing: -0.03em; }
+.sk-logo { display: inline-flex; align-items: center; gap: 10px; font-weight: 800; font-size: 19px; letter-spacing: -0.03em; }
 .sk-logo-mark {
-  display: grid; place-items: center; width: 46px; height: 46px; border-radius: 50%;
-  background: var(--sk-violet); color: var(--sk-white); font-size: 22px; font-weight: 800;
+  display: grid; place-items: center; width: 40px; height: 40px; border-radius: 50%;
+  background: var(--sk-violet); color: var(--sk-white); font-size: 20px; font-weight: 800;
 }
+.sk-logo-mark svg { width: 24px; height: 24px; }
 .sk-nav { display: flex; justify-content: flex-end; align-items: center; gap: 4px; font-weight: 500; }
 .sk-nav a {
-  display: inline-flex; align-items: center; height: 46px; padding: 0 18px; border-radius: 100px;
+  display: inline-flex; align-items: center; height: 40px; padding: 0 16px; border-radius: 100px;
   transition: background .2s;
 }
 .sk-nav a:hover { background: rgba(124, 92, 245, .1); }
@@ -116,8 +117,8 @@ html { scroll-behavior: smooth; }
 
 /* 主题开关：日、月并排，紫色滑块停在当前主题上 */
 .sk-theme {
-  --size: 36px;
-  position: relative; display: inline-flex; padding: 4px; border-radius: 100px;
+  --size: 32px;
+  position: relative; display: inline-flex; padding: 3px; border-radius: 100px;
   background: rgba(var(--sk-ink-rgb), .07); border: 1px solid var(--sk-glass-edge);
 }
 .sk-theme button {
@@ -127,7 +128,7 @@ html { scroll-behavior: smooth; }
 .sk-theme button:hover { color: var(--sk-ink); }
 .sk-theme button[aria-pressed="true"] { color: var(--sk-white); }
 .sk-theme-thumb {
-  position: absolute; top: 4px; left: 4px; width: var(--size); height: var(--size); border-radius: 50%;
+  position: absolute; top: 3px; left: 3px; width: var(--size); height: var(--size); border-radius: 50%;
   background: var(--sk-violet); box-shadow: 0 6px 14px -6px rgba(90, 62, 214, .7);
   transition: transform .35s cubic-bezier(.3, 1.4, .5, 1);
 }
@@ -218,13 +219,14 @@ html { scroll-behavior: smooth; }
 @media (max-width: 860px) {
   .sk-header-wrap { padding: 12px 12px 0; }
   .sk { padding-top: 68px; }
-  .sk-header { height: 56px; padding: 0 6px; }
+  .sk-header { height: 50px; padding: 0 5px; }
   .sk-logo { font-size: 18px; gap: 8px; }
-  .sk-logo-mark { width: 42px; height: 42px; font-size: 19px; }
+  .sk-logo-mark { width: 38px; height: 38px; font-size: 18px; }
+  .sk-logo-mark svg { width: 22px; height: 22px; }
   .sk-nav { font-size: 14px; gap: 0; }
-  .sk-nav a { height: 42px; padding: 0 12px; }
+  .sk-nav a { height: 38px; padding: 0 12px; }
   .sk-head-left { gap: 8px; }
-  .sk-theme { --size: 30px; padding: 3px; }
+  .sk-theme { --size: 28px; padding: 3px; }
   .sk-theme-thumb { top: 3px; left: 3px; }
   .sk-theme svg { width: 16px; height: 16px; }
   .sk-orb-1 { width: 22vw; top: -30%; }
