@@ -5,15 +5,51 @@
   --sk-lilac: #c9b8ff;
   --sk-lilac-soft: #e9e2ff;
   --sk-mist: #f7f4ff;
-  --sk-white: #fff;
+  --sk-white: #fff;              /* 紫色按钮上的白字，两套主题都不变 */
+  --sk-surface: #fff;            /* 卡片、表格、页脚底色 */
   --sk-ink: #221a3f;
+  --sk-ink-rgb: 34, 26, 63;      /* 半透明文字和分隔线：rgba(var(--sk-ink-rgb), a) */
   --sk-ink-soft: #5d567a;
+  --sk-on-ink: #fff;             /* 墨色底上的字 */
+  --sk-accent-text: #5a3ed6;     /* 行内代码、标签上的紫字 */
+  --sk-sticker-ink: #221a3f;     /* 浅色贴纸和动作标签上的字，两套主题都用深色 */
   --sk-code: #241b45;
+  --sk-glass-rgb: 255, 255, 255; /* 毛玻璃底色 */
+  --sk-glass-edge: rgba(255, 255, 255, .85);
+  --sk-ring: rgba(255, 255, 255, .6);
+  --sk-dot: rgba(255, 255, 255, .6);
+  --sk-glow: #e9e0ff;
+  --sk-title: linear-gradient(100deg, #221a3f 0%, #5a3ed6 50%, #b45cf0 100%);
   --sk-hero: linear-gradient(165deg, #f4efff 0%, #e0d3ff 48%, #c9b4ff 100%);
   --sk-card-shadow: 0 1px 0 rgba(124, 92, 245, .08), 0 22px 44px -28px rgba(90, 62, 214, .45);
+  color-scheme: light;
   --sk-font: 'Bricolage Grotesque', -apple-system, 'PingFang SC', 'Hiragino Sans GB', sans-serif;
   --sk-mono: 'JetBrains Mono', ui-monospace, Menlo, monospace;
   font-family: var(--sk-font);
+}
+/* 暗色主题：页面底是近黑的深紫，首屏是深紫极光，主色提亮一档以保证在暗底上的对比度 */
+:root[data-theme="dark"] {
+  --sk-violet: #9479ff;
+  --sk-violet-deep: #5a3ed6;
+  --sk-lilac: #4b3a86;
+  --sk-lilac-soft: #2c2350;
+  --sk-mist: #110c22;
+  --sk-surface: #1a1433;
+  --sk-ink: #eeeaff;
+  --sk-ink-rgb: 238, 234, 255;
+  --sk-ink-soft: #b2a9d6;
+  --sk-on-ink: #110c22;
+  --sk-accent-text: #c9b8ff;
+  --sk-code: #0d0919;
+  --sk-glass-rgb: 34, 26, 66;
+  --sk-glass-edge: rgba(255, 255, 255, .14);
+  --sk-ring: rgba(190, 170, 255, .22);
+  --sk-dot: rgba(200, 180, 255, .28);
+  --sk-glow: rgba(124, 92, 245, .22);
+  --sk-title: linear-gradient(100deg, #f4f0ff 0%, #b9a2ff 50%, #f0a0ff 100%);
+  --sk-hero: linear-gradient(165deg, #140e29 0%, #1e1540 50%, #2d1d5e 100%);
+  --sk-card-shadow: 0 1px 0 rgba(255, 255, 255, .04), 0 24px 48px -28px rgba(0, 0, 0, .8);
+  color-scheme: dark;
 }
 html { scroll-behavior: smooth; }
 .sk {
@@ -34,7 +70,7 @@ html { scroll-behavior: smooth; }
 }
 .sk::after, .doc-hero::after {
   content: ''; position: absolute; inset: 0; z-index: 0; pointer-events: none;
-  background-image: radial-gradient(rgba(255, 255, 255, .6) 1px, transparent 1.5px);
+  background-image: radial-gradient(var(--sk-dot) 1px, transparent 1.5px);
   background-size: 26px 26px;
   -webkit-mask-image: radial-gradient(ellipse 70% 60% at 50% 42%, #000 20%, transparent 80%);
   mask-image: radial-gradient(ellipse 70% 60% at 50% 42%, #000 20%, transparent 80%);
@@ -46,8 +82,8 @@ html { scroll-behavior: smooth; }
 
 /* 背景里的透明细圆环 */
 .sk-ring { position: absolute; z-index: 0; aspect-ratio: 1; border-radius: 50%; pointer-events: none; }
-.sk-ring-1 { width: 62vw; right: -20vw; top: -26vw; border: 1.5px solid rgba(255, 255, 255, .6); }
-.sk-ring-2 { width: 40vw; left: -16vw; bottom: -18vw; border: 1.5px dashed rgba(255, 255, 255, .6); }
+.sk-ring-1 { width: 62vw; right: -20vw; top: -26vw; border: 1.5px solid var(--sk-ring); }
+.sk-ring-2 { width: 40vw; left: -16vw; bottom: -18vw; border: 1.5px dashed var(--sk-ring); }
 .sk-main { position: relative; z-index: 1; }
 
 /* 毛玻璃胶囊顶栏：固定在顶部，滚出首屏后变成更实的白色玻璃 */
@@ -56,13 +92,13 @@ html { scroll-behavior: smooth; }
   color: var(--sk-ink); pointer-events: none;
 }
 .sk-header-wrap .sk-header { pointer-events: auto; transition: background .3s ease, border-color .3s ease; }
-.sk-header-wrap.is-scrolled .sk-header { background: rgba(255, 255, 255, .86); border-color: var(--sk-lilac-soft); }
+.sk-header-wrap.is-scrolled .sk-header { background: rgba(var(--sk-glass-rgb), .86); border-color: var(--sk-lilac-soft); }
 .sk-header {
   display: flex; justify-content: space-between; align-items: center; height: 62px; padding: 0 8px;
   border-radius: 100px; font-size: 15px;
-  background: rgba(255, 255, 255, .5); border: 1px solid rgba(255, 255, 255, .85);
+  background: rgba(var(--sk-glass-rgb), .5); border: 1px solid var(--sk-glass-edge);
   backdrop-filter: blur(18px) saturate(140%); -webkit-backdrop-filter: blur(18px) saturate(140%);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .9), 0 14px 32px -18px rgba(90, 62, 214, .45);
+  box-shadow: inset 0 1px 0 var(--sk-glass-edge), 0 14px 32px -18px rgba(90, 62, 214, .45);
 }
 .sk-logo { display: inline-flex; align-items: center; gap: 10px; font-weight: 800; font-size: 21px; letter-spacing: -0.03em; }
 .sk-logo-mark {
@@ -76,6 +112,26 @@ html { scroll-behavior: smooth; }
 }
 .sk-nav a:hover { background: rgba(124, 92, 245, .1); }
 .sk-nav .sk-nav-gh { background: var(--sk-violet); color: var(--sk-white); }
+.sk-head-left { display: flex; align-items: center; gap: 16px; }
+
+/* 主题开关：日、月并排，紫色滑块停在当前主题上 */
+.sk-theme {
+  --size: 36px;
+  position: relative; display: inline-flex; padding: 4px; border-radius: 100px;
+  background: rgba(var(--sk-ink-rgb), .07); border: 1px solid var(--sk-glass-edge);
+}
+.sk-theme button {
+  position: relative; z-index: 1; display: grid; place-items: center; width: var(--size); height: var(--size);
+  border-radius: 50%; color: var(--sk-ink-soft); transition: color .25s;
+}
+.sk-theme button:hover { color: var(--sk-ink); }
+.sk-theme button[aria-pressed="true"] { color: var(--sk-white); }
+.sk-theme-thumb {
+  position: absolute; top: 4px; left: 4px; width: var(--size); height: var(--size); border-radius: 50%;
+  background: var(--sk-violet); box-shadow: 0 6px 14px -6px rgba(90, 62, 214, .7);
+  transition: transform .35s cubic-bezier(.3, 1.4, .5, 1);
+}
+.sk-theme.is-dark .sk-theme-thumb { transform: translateX(var(--size)); }
 .sk-nav .sk-nav-gh:hover { background: var(--sk-violet-deep); }
 
 .sk-main { flex: 1; display: flex; flex-direction: column; justify-content: space-between; padding: 0 36px 36px; }
@@ -108,7 +164,7 @@ html { scroll-behavior: smooth; }
 @keyframes sk-float { from { transform: translate3d(0, -12px, 0); } to { transform: translate3d(0, 14px, 0); } }
 .sk-sticker {
   position: absolute; display: flex; align-items: center; gap: 10px;
-  padding: 10px 16px 10px 10px; border-radius: 16px; color: var(--sk-ink);
+  padding: 10px 16px 10px 10px; border-radius: 16px; color: var(--sk-sticker-ink);
   border: 3px solid var(--sk-white);
   box-shadow: 0 10px 0 -2px rgba(90, 62, 214, .18), 0 18px 30px -12px rgba(90, 62, 214, .45);
   transform: rotate(var(--r)); cursor: grab; touch-action: none; user-select: none;
@@ -123,13 +179,13 @@ html { scroll-behavior: smooth; }
 .sk-sticker:active { cursor: grabbing; transform: rotate(0deg) scale(1.1); box-shadow: 0 16px 0 -2px rgba(90, 62, 214, .16), 0 30px 40px -12px rgba(90, 62, 214, .5); }
 .sk-sticker-icon {
   display: grid; place-items: center; width: 38px; height: 38px; border-radius: 11px;
-  background: var(--sk-ink); color: var(--sk-white); font-size: 18px;
+  background: var(--sk-sticker-ink); color: var(--sk-white); font-size: 18px;
 }
 .sk-sticker-text { display: flex; flex-direction: column; line-height: 1.15; }
 .sk-sticker-text small { font-family: 'JetBrains Mono', monospace; font-size: 11px; opacity: .7; }
 .sk-sticker-text b { font-size: 19px; font-weight: 700; letter-spacing: -0.02em; white-space: nowrap; }
 .sk-sticker.is-glass {
-  color: var(--sk-ink); background: rgba(255, 255, 255, .42); border-color: rgba(255, 255, 255, .9);
+  color: var(--sk-ink); background: rgba(var(--sk-glass-rgb), .42); border-color: var(--sk-glass-edge);
   backdrop-filter: blur(14px) saturate(150%); -webkit-backdrop-filter: blur(14px) saturate(150%);
 }
 .sk-sticker.is-glass .sk-sticker-icon { background: var(--sk-violet); color: var(--sk-white); }
@@ -141,9 +197,9 @@ html { scroll-behavior: smooth; }
 .sk-actions { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
 .sk-cmd {
   display: flex; align-items: center; gap: 12px; height: 56px; padding: 0 8px 0 20px; border-radius: 16px;
-  color: var(--sk-ink); background: rgba(255, 255, 255, .55); border: 1px solid rgba(255, 255, 255, .9);
+  color: var(--sk-ink); background: rgba(var(--sk-glass-rgb), .55); border: 1px solid var(--sk-glass-edge);
   backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .9), 0 12px 28px -18px rgba(90, 62, 214, .5);
+  box-shadow: inset 0 1px 0 var(--sk-glass-edge), 0 12px 28px -18px rgba(90, 62, 214, .5);
 }
 .sk-cmd code { font-family: 'JetBrains Mono', monospace; font-size: 15px; white-space: nowrap; }
 .sk-cmd code span { opacity: .5; margin-right: 10px; }
@@ -167,6 +223,10 @@ html { scroll-behavior: smooth; }
   .sk-logo-mark { width: 42px; height: 42px; font-size: 19px; }
   .sk-nav { font-size: 14px; gap: 0; }
   .sk-nav a { height: 42px; padding: 0 12px; }
+  .sk-head-left { gap: 8px; }
+  .sk-theme { --size: 30px; padding: 3px; }
+  .sk-theme-thumb { top: 3px; left: 3px; }
+  .sk-theme svg { width: 16px; height: 16px; }
   .sk-orb-1 { width: 22vw; top: -30%; }
   .sk-orb-2 { width: 12vw; }
   .sk-main { padding: 0 16px 24px; }

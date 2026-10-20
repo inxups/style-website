@@ -2,6 +2,7 @@ import { Fragment, useEffect, useRef, useState } from 'react'
 import { REPO_URL } from './shared.js'
 import { DOCS_HOME, LAYERS, layerUrl, resolveHref } from './docs-content.js'
 import LogoIcon from './LogoIcon.jsx'
+import ThemeToggle from './ThemeToggle.jsx'
 import Code from './Code.jsx'
 import './home.css'
 import './sections.css'
@@ -287,7 +288,10 @@ function Header() {
   return (
     <div className="sk-header-wrap is-scrolled">
       <header className="sk-header">
-        <a className="sk-logo" href={HOME}><span className="sk-logo-mark"><LogoIcon /></span>STYLE</a>
+        <div className="sk-head-left">
+          <a className="sk-logo" href={HOME}><span className="sk-logo-mark"><LogoIcon /></span>STYLE</a>
+          <ThemeToggle />
+        </div>
         <nav className="sk-nav">
           <a href={HOME} className="doc-nav-home">首页</a>
           {LAYER && <a href={DOCS_HOME}>文档概览</a>}

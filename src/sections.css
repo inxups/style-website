@@ -1,6 +1,6 @@
 /* ---------- 通用区块 ---------- */
 .sec { position: relative; overflow: hidden; padding: 128px 36px; scroll-margin-top: 0; }
-.sec-mist { background: radial-gradient(70% 420px at 50% 0%, #e9e0ff, transparent), var(--sk-mist); color: var(--sk-ink); }
+.sec-mist { background: radial-gradient(70% 420px at 50% 0%, var(--sk-glow), transparent), var(--sk-mist); color: var(--sk-ink); }
 .sec-inner { position: relative; z-index: 1; max-width: 1200px; margin: 0 auto; }
 
 .sec-head { max-width: 920px; margin-bottom: 64px; }
@@ -14,7 +14,7 @@
 }
 /* 大标题用深紫到紫粉的渐变字 */
 .sec-title, .doc-hero h1 {
-  background: linear-gradient(100deg, var(--sk-ink) 0%, var(--sk-violet-deep) 50%, #b45cf0 100%);
+  background: var(--sk-title);
   -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
 }
 .sec-sub { margin-top: 20px; font-size: 19px; line-height: 1.65; color: var(--sk-ink-soft); max-width: 560px; }
@@ -50,19 +50,19 @@
 .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; align-items: start; }
 .step {
   display: flex; flex-direction: column; gap: 12px; padding: 28px; border-radius: 24px;
-  background: var(--sk-white); border: 1.5px solid var(--sk-lilac-soft); box-shadow: var(--sk-card-shadow);
+  background: var(--sk-surface); border: 1.5px solid var(--sk-lilac-soft); box-shadow: var(--sk-card-shadow);
 }
 .step:nth-child(2) { transition-delay: .08s; }
 .step:nth-child(3) { transition-delay: .16s; }
 .step-tag {
   align-self: flex-start; padding: 4px 12px; border-radius: 100px;
-  font-family: var(--sk-mono); font-size: 13px; font-weight: 600; color: var(--sk-ink);
+  font-family: var(--sk-mono); font-size: 13px; font-weight: 600; color: var(--sk-sticker-ink);
 }
 .step h3 { margin-top: 8px; font-size: 26px; font-weight: 800; letter-spacing: -0.02em; }
 .step p { font-size: 15px; line-height: 1.6; color: var(--sk-ink-soft); margin-bottom: 8px; }
 
 /* ---------- 页脚 ---------- */
-.foot { background: var(--sk-white); color: var(--sk-ink); padding: 40px 36px; border-top: 1px solid var(--sk-lilac-soft); }
+.foot { background: var(--sk-surface); color: var(--sk-ink); padding: 40px 36px; border-top: 1px solid var(--sk-lilac-soft); }
 .foot-bar {
   max-width: 1200px; margin: 0 auto;
   display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap; font-size: 14px;
