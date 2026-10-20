@@ -2,7 +2,7 @@
 
 [English](README.md) | 简体中文
 
-STYLE 的官网与文档站，使用 React 和 Vite 构建，部署在 GitHub Pages：<https://inxups.github.io/style-website/>。
+STYLE 的官网与文档站，使用 React 和 Vite 构建，部署在 GitHub Pages：<https://style.pixulse.com/>。
 
 ## 快速介绍
 
@@ -27,7 +27,7 @@ npm ci
 npm run dev
 ```
 
-站点配置了 `base: '/style-website/'`，启动后请打开 <http://localhost:5173/style-website/>，文档在 <http://localhost:5173/style-website/docs/>。
+站点为自定义域名配置了 `base: '/'`，启动后请打开 <http://localhost:5173/>，文档在 <http://localhost:5173/docs/>。
 
 ## 主要功能
 
@@ -76,8 +76,8 @@ npm run preview   # 本地预览构建结果
 
 ## 常见问题
 
-**本地打开 `http://localhost:5173/` 是空白或 404？**
-站点挂在 `/style-website/` 路径下，需要访问 <http://localhost:5173/style-website/>。
+**DNS 和 GitHub Pages 配好后，自定义域名打开仍是空白？**
+检查 `vite.config.js` 中的 `base` 是否为 `'/'`，然后重新构建部署。旧的 `'/style-website/'` 会让页面从自定义域名下不存在的仓库路径加载资源。
 
 **新增一层后，直接访问 `docs/<slug>/` 返回 404？**
 层的地址来自 `src/docs-layers.js` 中的 `slug`。开发时由 Vite 中间件改写到 `docs/index.html`，构建时由插件为每个 slug 复制一份页面，两者都只认这个文件里登记过的 slug。

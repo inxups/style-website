@@ -2,7 +2,7 @@
 
 English | [简体中文](README.zh_CN.md)
 
-The website and documentation for STYLE, built with React and Vite and deployed to GitHub Pages at <https://inxups.github.io/style-website/>.
+The website and documentation for STYLE, built with React and Vite and deployed to GitHub Pages at <https://style.pixulse.com/>.
 
 ## About
 
@@ -27,7 +27,7 @@ npm ci
 npm run dev
 ```
 
-The site is configured with `base: '/style-website/'`, so once the server is up, open <http://localhost:5173/style-website/>. The docs are at <http://localhost:5173/style-website/docs/>.
+The site is configured with `base: '/'` for its custom domain, so once the server is up, open <http://localhost:5173/>. The docs are at <http://localhost:5173/docs/>.
 
 ## Features
 
@@ -76,8 +76,8 @@ To add a docs page:
 
 ## FAQ
 
-**Opening `http://localhost:5173/` shows a blank page or 404?**
-The site is served under `/style-website/`, so visit <http://localhost:5173/style-website/>.
+**The custom domain shows a blank page after configuring DNS and GitHub Pages?**
+Check that `base` in `vite.config.js` is `'/'`, then rebuild and deploy. The old `'/style-website/'` base makes the page request assets under a nonexistent repository path on the custom domain.
 
 **After adding a layer, visiting `docs/<slug>/` directly returns 404?**
 Layer URLs come from the `slug` values in `src/docs-layers.js`. In development a Vite middleware rewrites them to `docs/index.html`, and at build time a plugin copies the page for each slug; both only recognize slugs registered in that file.

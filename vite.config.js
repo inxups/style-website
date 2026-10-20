@@ -4,8 +4,8 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { LAYERS } from './src/docs-layers.js'
 
-// GitHub Pages serves this repo at https://inxups.github.io/style-website/
-const BASE = '/style-website/'
+// The custom domain serves this site at https://style.pixulse.com/.
+const BASE = '/'
 
 // 文档每一层都有自己的地址（docs/<slug>/），共用 docs/index.html：
 // 开发时把这些地址改写到 docs/index.html，构建后给每层复制一份，GitHub Pages 直接访问或刷新都不会 404
