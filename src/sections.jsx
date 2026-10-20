@@ -1,4 +1,4 @@
-import { DOCS_URL, INSTALL_CMD, REPO_URL, useCopy } from './shared.js'
+import { DOCS_URL, REPO_URL } from './shared.js'
 import LogoIcon from './LogoIcon.jsx'
 import Code from './Code.jsx'
 import './sections.css'
@@ -75,19 +75,8 @@ export function Intro() {
 }
 
 export function Footer() {
-  const [copied, copy] = useCopy()
   return (
     <footer className="foot">
-      <div className="foot-cta" data-reveal>
-        <h2>现在就给你的 Agent<br />立点规矩。</h2>
-        <div className="foot-actions">
-          <div className="sk-cmd">
-            <code><span>$</span>{INSTALL_CMD}</code>
-            <button onClick={() => copy()} aria-label="复制命令">{copied ? '✓' : '复制'}</button>
-          </div>
-          <a className="sk-btn" href={DOCS_URL}>阅读文档 →</a>
-        </div>
-      </div>
       <div className="foot-bar">
         <a className="foot-logo" href="#top"><span className="foot-mark"><LogoIcon size={20} /></span>STYLE</a>
         <span className="foot-note">支持 Claude Code · Codex</span>

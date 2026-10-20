@@ -57,15 +57,9 @@
 .step p { font-size: 15px; line-height: 1.6; color: #4a4c6b; margin-bottom: 8px; }
 
 /* ---------- 页脚 ---------- */
-.foot { background: var(--sk-ink); color: var(--sk-cream); padding: 120px 36px 40px; }
-.foot-cta {
-  max-width: 1200px; margin: 0 auto; display: flex; align-items: flex-end; justify-content: space-between; gap: 40px; flex-wrap: wrap;
-  padding-bottom: 96px; border-bottom: 1px solid rgba(255, 251, 239, .14);
-}
-.foot-cta h2 { font-weight: 800; letter-spacing: -0.035em; line-height: 1.05; font-size: clamp(36px, 5vw, 72px); }
-.foot-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+.foot { background: var(--sk-ink); color: var(--sk-cream); padding: 40px 36px; }
 .foot-bar {
-  max-width: 1200px; margin: 0 auto; padding-top: 32px;
+  max-width: 1200px; margin: 0 auto;
   display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap; font-size: 14px;
 }
 .foot-logo { display: inline-flex; align-items: center; gap: 10px; font-weight: 800; font-size: 18px; }
@@ -83,10 +77,7 @@
   .steps { grid-template-columns: 1fr; }
   .step { padding: 22px; }
   .step .code { padding: 16px; font-size: 12.5px; }
-  .foot { padding: 88px 16px 32px; }
-  .foot-actions, .foot-actions .sk-cmd, .foot-actions .sk-btn { width: 100%; }
-  .foot-actions .sk-cmd { justify-content: space-between; }
-  .foot-actions .sk-btn { justify-content: center; }
+  .foot { padding: 32px 16px; }
   .foot-bar nav { gap: 16px; flex-wrap: wrap; }
 }
 @media (min-width: 861px) and (max-width: 1080px) {
