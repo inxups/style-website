@@ -32,6 +32,7 @@ The site is configured with `base: '/'` for its custom domain, so once the serve
 ## Features
 
 - **Landing page**: draggable rule stickers, sample rules (`warn` / `block` / `inject`) and a one-click copy of the install command
+- **Agent skills**: introduces `style-creator` and `style-installer` from [inxups/inxv-skills](https://github.com/inxups/inxv-skills), with copyable install commands for Claude Code and Codex
 - **Docs site**: reads `docs/style-yaml/*.md` and splits it into separate pages by layer (basics, package fields, rules, native hooks, commands and diagnostics), each served at `docs/<slug>/`
 - **Link rewriting**: relative `.md` links between Markdown pages are rewritten into anchors on the matching layer page
 - **Light / dark theme**: follows the system by default, remembers a manual choice in `localStorage`, and applies it before first paint so there is no flash

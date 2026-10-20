@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { DOCS_URL, INSTALL_CMD, REPO_URL, useCopy } from './shared.js'
 import LogoIcon from './LogoIcon.jsx'
 import ThemeToggle from './ThemeToggle.jsx'
-import { Intro, Footer } from './sections.jsx'
+import { Intro, Skills, Footer } from './sections.jsx'
 import './home.css'
 
 // 贴纸位置固定：x / y 是相对字标区域的百分比位置，r 是旋转角度。最后一个是毛玻璃款
@@ -182,6 +182,7 @@ export default function Home() {
       </section>
 
       <Intro />
+      <Skills />
       <Footer />
     </>
   )

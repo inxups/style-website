@@ -61,6 +61,26 @@
 .step h3 { margin-top: 8px; font-size: 26px; font-weight: 800; letter-spacing: -0.02em; }
 .step p { font-size: 15px; line-height: 1.6; color: var(--sk-ink-soft); margin-bottom: 8px; }
 
+/* ---------- 02 Agent skills ---------- */
+#skills { background: var(--sk-surface); color: var(--sk-ink); }
+.skills { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: stretch; }
+.skill { background: var(--sk-mist); }
+.skill .step-tag { font-weight: 700; }
+.skill-prompt {
+  margin: 0 0 4px; padding: 14px 16px; border-radius: 14px; border-left: 3px solid var(--sk-violet);
+  background: var(--sk-surface); font-size: 15px; line-height: 1.6; color: var(--sk-ink);
+}
+.skill-prompt::before { content: '对 Agent 说：'; display: block; margin-bottom: 4px; font-size: 12px; color: var(--sk-ink-soft); }
+.skill-link { margin-top: auto; align-self: flex-start; font-size: 14px; font-weight: 600; color: var(--sk-accent-text); }
+.skill-link:hover { text-decoration: underline; }
+
+.skill-install { margin-top: 32px; }
+.skill-tabs { display: inline-flex; gap: 4px; padding: 4px; margin-bottom: 12px; border-radius: 100px; background: var(--sk-lilac-soft); }
+.skill-tabs button {
+  height: 32px; padding: 0 16px; border-radius: 100px; font-size: 14px; font-weight: 600; color: var(--sk-ink-soft);
+}
+.skill-tabs button[aria-selected="true"] { background: var(--sk-violet); color: var(--sk-white); }
+
 /* ---------- 页脚 ---------- */
 .foot { background: var(--sk-surface); color: var(--sk-ink); padding: 40px 36px; border-top: 1px solid var(--sk-lilac-soft); }
 .foot-bar {
@@ -79,7 +99,7 @@
   .sec { padding: 88px 16px; }
   .sec-head { margin-bottom: 40px; }
   .sec-sub { font-size: 17px; }
-  .steps { grid-template-columns: 1fr; }
+  .steps, .skills { grid-template-columns: 1fr; }
   .step { padding: 22px; }
   .step .code { padding: 16px; font-size: 12.5px; }
   .foot { padding: 32px 16px; }

@@ -32,6 +32,7 @@ npm run dev
 ## 主要功能
 
 - **首页**：可拖动的规则贴纸、示例规则（`warn` / `block` / `inject`）和一键复制安装命令
+- **Agent skill**：介绍 [inxups/inxv-skills](https://github.com/inxups/inxv-skills) 里的 `style-creator` 和 `style-installer`，提供 Claude Code 与 Codex 的一键复制安装命令
 - **文档站**：读取 `docs/style-yaml/*.md`，按层（基础、包级字段、规则、原生 hook、命令与诊断）分成独立页面，每层地址为 `docs/<slug>/`
 - **站内链接改写**：Markdown 中页面之间的 `.md` 相对链接会自动改成对应层页面上的锚点
 - **亮色 / 暗色主题**：默认跟随系统，手动切换后记在 `localStorage`，首屏渲染前就设好，不会闪烁
