@@ -113,7 +113,7 @@ export default function Home() {
 
           <div className="sk-bottom">
             <div className="sk-copy">
-              <p className="sk-sub">给你的 Agent 贴上规矩。<br />一组 hook，一种风格。</p>
+              <p className="sk-sub">你的 Agent，<br />也该有你的 STYLE。</p>
               <span className="sk-hint">↖ 贴纸可以拖动</span>
             </div>
             <div className="sk-actions">
