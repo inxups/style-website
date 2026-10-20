@@ -39,7 +39,7 @@ export function QuickStart() {
   return (
     <section className="sec sec-cream" id="start">
       <div className="sec-inner">
-        <SectionHead index="01" label="快速开始" title="三步，给 Agent 立规矩" sub="不改 agent 本身，也不用学新工具。写好规则、装上，之后照常对话。" />
+        <SectionHead index="01" label="快速介绍" title="三步，给 Agent 立规矩" sub="不改 agent 本身，也不用学新工具。写好规则、装上，之后照常对话。" />
         <div className="steps">
           <article className="step" data-reveal>
             <span className="step-n">1</span>
@@ -90,8 +90,7 @@ export function Footer() {
         <span className="foot-note">支持 Claude Code · Codex</span>
         <nav>
           <a href={DOCS_URL}>文档</a>
-          <a href="#start">快速开始</a>
-          <a href="#how">工作原理</a>
+          <a href="#start">快速介绍</a>
           <a href={REPO_URL} target="_blank" rel="noreferrer">GitHub</a>
         </nav>
       </div>
