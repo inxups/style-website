@@ -1,7 +1,6 @@
 /* ---------- 通用区块 ---------- */
 .sec { position: relative; overflow: hidden; padding: 128px 36px; scroll-margin-top: 0; }
 .sec-cream { background: var(--sk-cream); color: var(--sk-ink); }
-.sec-blue { background: var(--sk-blue); color: var(--sk-cream); }
 .sec-inner { position: relative; z-index: 1; max-width: 1200px; margin: 0 auto; }
 
 .sec-head { max-width: 920px; margin-bottom: 64px; }
@@ -69,79 +68,6 @@
   padding: 1px 8px; border-radius: 6px; font-weight: 600; font-size: 12px; color: var(--sk-ink);
 }
 
-/* ---------- 02 工作原理 ---------- */
-.sec-orb {
-  position: absolute; width: 520px; aspect-ratio: 1; right: -160px; top: -120px; border-radius: 50%;
-  background: radial-gradient(circle at 30% 25%, rgba(255, 255, 255, .35), rgba(255, 255, 255, .06) 45%, rgba(255, 255, 255, .02) 72%);
-  border: 1px solid rgba(255, 255, 255, .25);
-}
-.track { position: relative; list-style: none; display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; }
-.track::before {
-  content: ''; position: absolute; left: 0; right: 0; top: 11px; height: 2px;
-  background: repeating-linear-gradient(90deg, rgba(255, 255, 255, .5) 0 8px, transparent 8px 16px);
-}
-.node {
-  position: relative; display: flex; flex-direction: column; gap: 6px; padding: 52px 20px 22px;
-  border-radius: 22px; background: rgba(255, 255, 255, .1); border: 1px solid rgba(255, 255, 255, .24);
-  backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .25);
-}
-.node-dot {
-  position: absolute; top: 2px; left: 20px; width: 20px; height: 20px; border-radius: 50%;
-  background: var(--sk-cream); box-shadow: 0 0 0 5px rgba(255, 251, 239, .22);
-}
-.node-i { font-family: var(--sk-mono); font-size: 12px; opacity: .6; }
-.node h3 { font-size: 19px; font-weight: 700; letter-spacing: -0.02em; word-break: break-word; }
-.node-zh { font-size: 14px; font-weight: 600; opacity: .85; }
-.node p { font-size: 14px; line-height: 1.55; opacity: .7; margin-top: 4px; flex: 1; }
-.node-styles { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
-.node-styles span {
-  display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px 3px 6px; border-radius: 100px;
-  background: rgba(255, 255, 255, .12); font-family: var(--sk-mono); font-size: 12px;
-}
-.node-styles i { width: 10px; height: 10px; border-radius: 50%; }
-
-/* ---------- 03 内置风格 ---------- */
-.style-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
-.style-card {
-  display: flex; flex-direction: column; gap: 10px; padding: 26px; border-radius: 22px;
-  background: var(--bg); color: var(--sk-ink); border: 3px solid var(--sk-ink);
-  box-shadow: 0 8px 0 -2px rgba(14, 15, 44, .9);
-}
-.style-card.is-in { transform: rotate(var(--r)); }
-.style-card.is-in:hover { transform: rotate(0deg) translateY(-4px); }
-.style-top { display: flex; align-items: center; justify-content: space-between; }
-.style-icon {
-  display: grid; place-items: center; width: 44px; height: 44px; border-radius: 13px;
-  background: var(--sk-ink); color: var(--sk-cream); font-size: 20px;
-}
-.style-event { font-family: var(--sk-mono); font-size: 12px; padding: 4px 10px; border-radius: 100px; background: rgba(14, 15, 44, .1); }
-.style-card h3 { margin-top: 10px; font-size: 32px; font-weight: 800; letter-spacing: -0.03em; }
-.style-card p { font-size: 15px; line-height: 1.6; color: rgba(14, 15, 44, .75); }
-
-/* ---------- 04 自定义 ---------- */
-.sec-ring {
-  position: absolute; width: 640px; aspect-ratio: 1; left: -260px; bottom: -320px; border-radius: 50%;
-  border: 1.5px dashed rgba(255, 255, 255, .16);
-}
-.custom { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: 64px; align-items: center; }
-.custom .sec-head { margin-bottom: 36px; }
-.custom .sec-title { font-size: clamp(40px, 4.4vw, 64px); }
-.custom-points { list-style: none; display: flex; flex-direction: column; gap: 18px; }
-.custom-points li { position: relative; padding-left: 28px; font-size: 17px; line-height: 1.6; opacity: .85; }
-.custom-points li::before {
-  content: ''; position: absolute; left: 0; top: .5em; width: 12px; height: 12px; border-radius: 50%;
-  background: #ffe14a;
-}
-.custom-points b { font-weight: 700; }
-.custom-points code { font-family: var(--sk-mono); font-size: 14px; padding: 2px 8px; border-radius: 6px; background: rgba(255, 255, 255, .14); }
-.custom-code {
-  padding: 10px; border-radius: 26px; background: rgba(255, 255, 255, .1); border: 1px solid rgba(255, 255, 255, .24);
-  backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
-}
-.custom-code .code { padding: 24px; font-size: 14px; }
-.custom-code .codebox { border-radius: 18px; }
-
 /* ---------- 页脚 ---------- */
 .foot { background: var(--sk-ink); color: var(--sk-cream); padding: 120px 36px 40px; }
 .foot-cta {
@@ -162,19 +88,11 @@
 .foot-bar nav a:hover { opacity: 1; }
 
 /* ---------- 响应式 ---------- */
-@media (max-width: 1080px) {
-  .track { grid-template-columns: 1fr; gap: 14px; padding-left: 36px; }
-  .track::before { left: 9px; right: auto; top: 0; bottom: 0; width: 2px; height: auto;
-    background: repeating-linear-gradient(180deg, rgba(255, 255, 255, .5) 0 8px, transparent 8px 16px); }
-  .node { padding: 22px 22px 22px; }
-  .node-dot { top: 24px; left: -36px; }
-  .custom { grid-template-columns: 1fr; gap: 40px; }
-}
 @media (max-width: 860px) {
   .sec { padding: 88px 16px; }
   .sec-head { margin-bottom: 40px; }
   .sec-sub { font-size: 17px; }
-  .steps, .style-grid { grid-template-columns: 1fr; }
+  .steps { grid-template-columns: 1fr; }
   .foot { padding: 88px 16px 32px; }
   .foot-actions, .foot-actions .sk-cmd, .foot-actions .sk-btn { width: 100%; }
   .foot-actions .sk-cmd { justify-content: space-between; }
@@ -184,7 +102,6 @@
 @media (min-width: 861px) and (max-width: 1080px) {
   .steps { grid-template-columns: 1fr 1fr; }
   .step:nth-child(3) { grid-column: 1 / -1; }
-  .style-grid { grid-template-columns: 1fr 1fr; }
 }
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
@@ -192,4 +109,4 @@
 }
 
 /* 网格子项允许收缩，避免长代码行把卡片撑出屏幕 */
-.step, .node, .style-card, .custom-copy, .custom-code { min-width: 0; }
+.step { min-width: 0; }

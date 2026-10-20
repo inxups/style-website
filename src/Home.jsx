@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { DOCS_URL, INSTALL_CMD, REPO_URL, useCopy } from './shared.js'
 import LogoIcon from './LogoIcon.jsx'
-import { QuickStart, Lifecycle, Targets, CustomStyle, Footer } from './sections.jsx'
+import { QuickStart, Footer } from './sections.jsx'
 import './home.css'
 
 // x / y 是相对字标区域的百分比位置，r 是旋转角度
@@ -92,7 +92,6 @@ export default function Home() {
           <a className="sk-logo" href="#top"><span className="sk-logo-mark"><LogoIcon /></span>STYLE</a>
           <nav className="sk-nav">
             <a href={DOCS_URL}>文档</a>
-            <a href="#targets">规则</a>
             <a className="sk-nav-gh" href={REPO_URL} target="_blank" rel="noreferrer">GitHub ↗</a>
           </nav>
         </header>
@@ -129,9 +128,6 @@ export default function Home() {
       </section>
 
       <QuickStart />
-      <Lifecycle />
-      <Targets />
-      <CustomStyle />
       <Footer />
     </>
   )
