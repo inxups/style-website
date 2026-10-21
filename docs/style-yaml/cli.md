@@ -45,7 +45,7 @@ sources:
 ### 通用约定
 
 - `style --help` 列出所有命令；`style help <command>` 或 `<command> --help` 还会列出该命令的 advanced 参数和可用的全局参数。`--help` / `-h` 放在命令行任何位置都有效。
-- `style --version` 输出 `style 0.3.0` 这样的一行，退出码 0，后面不能再带其他参数。
+- `style --version` 输出 `style 0.3.1` 这样的一行，退出码 0，后面不能再带其他参数。
 - 取值参数写成 `--ref v` 或 `--ref=v` 都可以。值可以是负数（例如 `--since -1h`），这时由参数自己的范围检查报错，不会被当成缺少值。
 - 布尔参数不带值：写 `--json`，不写 `--json=true`。
 - 标 `...` 的参数可以重复，例如 `--set a=1 --set b=2`。未知参数和多余的位置参数都是用法错误。
@@ -270,7 +270,10 @@ style install <source>... [--harness auto|h[,h]]... [--set [package.]k=v]... [--
 
 同一个包重复安装且内容没有变化时，结果为 unchanged，不改写任何文件，退出码 0。
 
-选择 `claude-plugin` 这类需要在 harness 里手动注册的 route 时，文件会写好，但 harness 要等注册之后才会加载。这时退出码为 1，诊断码 `registration-required`，报告里列出需要运行的注册命令。
+选择插件 route 时，文件会写好，但 harness 要等注册之后才会加载，报告里列出需要运行的注册命令。两个插件 route 的处理不同：
+
+- `claude-plugin`：没有注册时退出码为 1，诊断码 `registration-required`（error）。
+- `codex-plugin`：STYLE 同时生成一个本地 marketplace 目录。没有注册时只报 `registration-required` 警告，退出码 0，因为未注册只影响运行时 hook，静态规则照常生效。注册命令为 `codex plugin marketplace add <目录>` 和 `codex plugin add <插件 id>`，命令前带 `CODEX_HOME=...`；报告里还列出对应的 `remove` 命令。Codex 从自己的缓存运行插件，STYLE 重新生成插件后状态变为 `refresh-required`，需要再运行一次 `codex plugin add`。
 
 ### `link`
 
@@ -506,7 +509,7 @@ style explain --harness claude-code --payload event.json
 - **`doctor --live` 先做完整的健康检查。** 实时检查之前会先检测 harness、检查安装，耗时比单独的回调检查长。
 - **`sync` 中途取消时，已确认的包不会回滚。** 每个包的审批是一次独立的事务；取消之后，之前确认的包保持已写入。
 - **脚本里的 `sync` 需要为每个待审批的包各写一行回答。** 没有回答时取消，退出码 1，不再有单独的“需要审批”退出码。
-- **`registration-required` 时文件已经写入。** 安装退出 1，但生成的插件文件和 lock 已经更新；按报告运行注册命令后，harness 才会加载插件。
+- **`registration-required` 时文件已经写入。** `claude-plugin` 安装退出 1、`codex-plugin` 安装退出 0，但两者生成的插件文件和 lock 都已经更新；按报告运行注册命令后，harness 才会加载插件。
 - **`explain` 一次只能模拟一个 harness。** 要比较两个 harness，需要分别运行。
 - **拉取后才发现的 Git 问题不是用法错误。** 包路径或 ref 在远端不存在时退出码是 1，不是 2，因为要看远端仓库的状态才知道。
 - **`doctor` 的文本输出不含未检测到的 harness 的能力矩阵。** 需要时用 `--json`。

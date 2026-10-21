@@ -220,7 +220,7 @@ warning 级诊断前加 `warning`，error 不加前缀；没有位置时省略�
 | `conflict` | error | 与已有安装冲突 |
 | `lock-invalid` | error | `style.lock.yaml` 无法读取或不是合法的 lock |
 | `frozen-metadata-incomplete` | error | `restore` 读到的 lock 可以解析，但缺少格式或格式不受支持 |
-| `registration-required` | error | 插件已写入，但需要在 harness 里手动注册才会加载 |
+| `registration-required` | error / warning | 插件已写入，但需要在 harness 里手动注册才会加载；`claude-plugin` 为 error（退出码 1），`codex-plugin` 为 warning（退出码 0，静态规则照常生效） |
 | `project-binding-invalid` | error | 全局参数 `--project` 指定的项目无法绑定，例如目录不存在 |
 | `probe-not-installed` | error | `doctor --live` 时没有可读的安装 |
 | `probe-timeout` | error | `doctor --live` 等待回调超时 |
